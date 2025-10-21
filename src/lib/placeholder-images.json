@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-couple",
+      "description": "A happy couple smiling at their wedding.",
+      "imageUrl": "https://images.unsplash.com/photo-1501901609772-df0848060b33?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxoYXBweSUyMGNvdXBsZXxlbnwwfHx8fDE3NjEwMDE2NjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "happy couple"
+    },
+    {
+      "id": "gifts-honeymoon",
+      "description": "A beautiful tropical beach for a honeymoon.",
+      "imageUrl": "https://images.unsplash.com/photo-1535262412227-85541e910204?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cm9waWNhbCUyMGJlYWNofGVufDB8fHx8MTc2MTA3MDQwMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tropical beach"
+    },
+    {
+      "id": "gifts-cookware",
+      "description": "A set of modern cookware.",
+      "imageUrl": "https://images.unsplash.com/photo-1715690999094-670aa76bdecd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjb29rd2FyZXxlbnwwfHx8fDE3NjEwODkxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern cookware"
+    },
+    {
+      "id": "gifts-appliances",
+      "description": "Modern kitchen appliances.",
+      "imageUrl": "https://images.unsplash.com/photo-1556185781-a47769abb7ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxraXRjaGVuJTIwYXBwbGlhbmNlc3xlbnwwfHx8fDE3NjEwNjAxMTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "kitchen appliances"
+    }
+  ]
 }
