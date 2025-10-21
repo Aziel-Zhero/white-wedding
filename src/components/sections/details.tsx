@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Church, GlassWine } from "lucide-react";
+import { Church, Glasses } from "lucide-react";
 
 export default function DetailsSection() {
   return (
@@ -35,7 +35,7 @@ export default function DetailsSection() {
           <Card className="text-center shadow-xl transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
               <div className="mx-auto bg-accent/20 p-4 rounded-full w-fit">
-                <GlassWine className="h-10 w-10 text-accent-foreground" />
+                <Glasses className="h-10 w-10 text-accent-foreground" />
               </div>
               <CardTitle className="font-headline text-3xl mt-4">Recepção</CardTitle>
             </CardHeader>
