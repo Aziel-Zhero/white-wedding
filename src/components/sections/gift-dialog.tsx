@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper, Upload, ClipboardCopy, Gift } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
+import { Separator } from "../ui/separator";
 
 interface GiftDialogProps {
   gift: GiftType;
@@ -58,7 +59,6 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   const { toast } = useToast();
 
   const remainingAmount = gift.totalPrice - gift.contributedAmount;
-  const isGifted = remainingAmount <= 0;
 
   const form = useForm<GiftFormValues>({
     resolver: zodResolver(giftFormSchema),
@@ -112,9 +112,9 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl p-0">
         {isConfirmed ? (
-           <div className="text-center p-8">
+           <div className="text-center p-8 md:p-12">
              <PartyPopper className="h-16 w-16 mx-auto text-primary" />
              <DialogHeader>
                 <DialogTitle className="text-2xl font-headline mt-4">Muito Obrigado!</DialogTitle>
@@ -127,66 +127,90 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
              </Button>
            </div>
         ) : (
-          <div className="flex flex-col">
-            <DialogHeader>
-              <DialogTitle className="font-headline text-2xl flex items-center gap-2">
-                <Gift className="h-6 w-6" /> Presentear: {gift.name}
-              </DialogTitle>
-              <DialogDescription>
-                Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar este presente. Contribua com qualquer valor!
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4 space-y-4 text-center">
-                <div className="relative w-48 h-48 mx-auto border-4 border-primary rounded-lg overflow-hidden">
-                    <Image src={qrCodeImage} alt="QR Code PIX" layout="fill" objectFit="cover" />
-                </div>
-                <p className="text-sm text-muted-foreground">Escaneie o QR Code acima ou copie a chave.</p>
-                <div className="flex items-center justify-center p-3 bg-secondary rounded-md">
-                    <code className="text-sm text-secondary-foreground break-all">{pixKey}</code>
-                    <Button variant="ghost" size="icon" className="ml-2 h-8 w-8" onClick={copyPixKey}>
-                        <ClipboardCopy className="h-4 w-4" />
-                    </Button>
-                </div>
+          <div className="grid md:grid-cols-2">
+            <div className="p-6 md:p-8 flex flex-col items-center justify-center bg-secondary/50 md:rounded-l-lg">
+                {gift.image && (
+                    <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border">
+                         <Image
+                            src={gift.image.imageUrl}
+                            alt={gift.name}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={gift.image.imageHint}
+                        />
+                    </div>
+                )}
+                 <div className="mt-4 text-center">
+                    <p className="font-headline text-xl">{gift.name}</p>
+                    <p className="text-sm text-muted-foreground">{gift.description}</p>
+                 </div>
             </div>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Valor da Contribuição (R$)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder={`Faltam R$ ${remainingAmount.toFixed(2)}`} {...field} onChange={event => field.onChange(event.target.value === '' ? undefined : +event.target.value)} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="proof"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Comprovante (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input type="file" {...form.register('proof')} />
-                      </FormControl>
-                      <FormDescription>
-                        Anexe o comprovante do PIX (print ou PDF).
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button type="submit" size="lg" className="w-full">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Confirmar Contribuição
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
+
+            <div className="p-6 md:p-8 flex flex-col">
+                 <DialogHeader className="text-left">
+                    <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                        <Gift className="h-6 w-6 text-primary" /> Presentear
+                    </DialogTitle>
+                    <DialogDescription>
+                        Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar. Contribua com qualquer valor!
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <Separator className="my-4" />
+
+                <div className="py-4 space-y-4 text-center">
+                    <div className="relative w-40 h-40 mx-auto border-4 border-primary rounded-lg overflow-hidden">
+                        <Image src={qrCodeImage} alt="QR Code PIX" layout="fill" objectFit="cover" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">Escaneie o QR Code acima ou copie a chave.</p>
+                    <div className="flex items-center justify-center p-3 bg-secondary rounded-md">
+                        <code className="text-sm text-secondary-foreground break-all">{pixKey}</code>
+                        <Button variant="ghost" size="icon" className="ml-2 h-8 w-8" onClick={copyPixKey}>
+                            <ClipboardCopy className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-auto">
+                    <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Valor da Contribuição (R$)</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder={`Faltam R$ ${remainingAmount.toFixed(2)}`} {...field} onChange={event => field.onChange(event.target.value === '' ? undefined : +event.target.value)} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="proof"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Comprovante (Opcional)</FormLabel>
+                        <FormControl>
+                            <Input type="file" {...form.register('proof')} />
+                        </FormControl>
+                        <FormDescription>
+                            Anexe o comprovante do PIX (print ou PDF).
+                        </FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <DialogFooter className="!mt-6">
+                    <Button type="submit" size="lg" className="w-full">
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Confirmar Contribuição
+                    </Button>
+                    </DialogFooter>
+                </form>
+                </Form>
+            </div>
           </div>
         )}
       </DialogContent>
