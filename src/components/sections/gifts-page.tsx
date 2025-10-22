@@ -57,7 +57,7 @@ export default function GiftsPageSection() {
               <Card 
                 key={gift.id} 
                 className={cn(
-                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col",
+                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg",
                   isGifted && "opacity-60"
                 )}
               >
