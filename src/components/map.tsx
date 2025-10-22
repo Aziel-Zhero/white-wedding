@@ -4,7 +4,7 @@ import { APIProvider, Map, AdvancedMarker } from "@vis.gl/react-google-maps";
 import { MapPin } from "lucide-react";
 
 export default function WeddingMap() {
-  const position = { lat: -23.18183, lng: -46.1944 }; // Chácara Sonho Verde, Igaratá - SP
+  const position = { lat: -22.889028, lng: -45.474278 }; // New Coordinates from user
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
