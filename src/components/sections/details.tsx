@@ -11,7 +11,7 @@ export default function DetailsSection() {
             Detalhes do Evento
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-            As informações mais importantes sobre o nosso grande dia.
+            A cerimônia e a recepção acontecerão no mesmo local para seu conforto.
           </p>
         </div>
 
@@ -24,11 +24,11 @@ export default function DetailsSection() {
               <CardTitle className="font-headline text-3xl mt-4">Cerimônia</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-muted-foreground">
-              <p className="font-bold text-lg text-foreground">Sábado, 28 de Outubro de 2024</p>
-              <p>às 16:00 horas</p>
+              <p className="font-bold text-lg text-foreground">Sábado, 16 de Maio de 2026</p>
+              <p>às 15:30 horas</p>
               <Separator className="my-4" />
-              <p className="font-semibold">Paróquia Nossa Senhora do Brasil</p>
-              <p>Praça Nossa Sra. do Brasil, 01 - Jardim América, São Paulo - SP</p>
+              <p className="font-semibold">Chácara Sonho Verde</p>
+              <p>Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
             </CardContent>
           </Card>
 
@@ -40,11 +40,11 @@ export default function DetailsSection() {
               <CardTitle className="font-headline text-3xl mt-4">Recepção</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-muted-foreground">
-              <p className="font-bold text-lg text-foreground">Sábado, 28 de Outubro de 2024</p>
+              <p className="font-bold text-lg text-foreground">Sábado, 16 de Maio de 2026</p>
               <p>após a cerimônia</p>
               <Separator className="my-4" />
-              <p className="font-semibold">Espaço Villa-Lobos</p>
-              <p>Av. Gonçalo Madeira, 209 - Jaguaré, São Paulo - SP</p>
+              <p className="font-semibold">Chácara Sonho Verde</p>
+              <p>Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
             </CardContent>
           </Card>
         </div>

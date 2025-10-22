@@ -67,7 +67,7 @@ export default function GiftsSection() {
         </div>
          <div id="rsvp" className="text-center mt-20">
             <h3 className="font-headline text-3xl font-bold">Confirme sua Presença</h3>
-            <p className="mt-2 text-muted-foreground">Por favor, confirme sua presença até 28 de Setembro de 2024.</p>
+            <p className="mt-2 text-muted-foreground">Por favor, confirme sua presença até 16 de Abril de 2026.</p>
             <Button size="lg" className="mt-6 animate-pulse">
                 <Link href="#">RSVP</Link>
             </Button>

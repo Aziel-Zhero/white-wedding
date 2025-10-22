@@ -30,7 +30,7 @@ export default function HeroSection() {
           Eduarda & Aziel
         </h1>
         <p className="text-xl md:text-2xl font-light">
-          28 de Outubro de 2024
+          16 de Maio de 2026
         </p>
         <Button asChild size="lg" className="mt-8">
           <Link href="#rsvp">Confirmar Presença</Link>

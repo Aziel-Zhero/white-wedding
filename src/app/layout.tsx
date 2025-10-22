@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Eduarda & Aziel - Unidos para Sempre',
-  description: 'Nosso convite de casamento. Junte-se a nós para celebrar nosso amor!',
+  title: 'Eduarda & Aziel - 16 de Maio de 2026',
+  description: 'Nosso convite de casamento. Junte-se a nós para celebrar nosso amor no dia 16 de Maio de 2026.',
 };
 
 export default function RootLayout({

@@ -14,8 +14,8 @@ export default function LocationSection() {
             A cerimônia e a recepção acontecerão no mesmo local para sua comodidade.
           </p>
           <div className="mt-6 text-lg">
-            <p className="font-semibold">Espaço Villa-Lobos</p>
-            <p className="text-muted-foreground">Av. Gonçalo Madeira, 209 - Jaguaré, São Paulo - SP</p>
+            <p className="font-semibold">Chácara Sonho Verde</p>
+            <p className="text-muted-foreground">Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
           </div>
         </div>
         
