@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Heart } from "lucide-react";
+import {
+  Menu,
+  X,
+  Heart,
+  Home,
+  Gem,
+  MapPin,
+  Gift,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -10,12 +18,13 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import RsvpDialog from "../sections/rsvp-dialog";
 
 const navLinks = [
-  { href: "/#inicio", label: "Início" },
-  { href: "/#cerimonia", label: "Cerimônia" },
-  { href: "/#local", label: "Local" },
-  { href: "/presentes", label: "Presentes" },
+  { href: "/#inicio", label: "Início", icon: <Home size={18} /> },
+  { href: "/#cerimonia", label: "Cerimônia", icon: <Gem size={18} /> },
+  { href: "/#local", label: "Local", icon: <MapPin size={18} /> },
+  { href: "/presentes", label: "Presentes", icon: <Gift size={18} /> },
 ];
 
 export default function Header() {
@@ -36,14 +45,15 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              {link.label}
+              {link.icon}
+              <span>{link.label}</span>
             </Link>
           ))}
-          <Button asChild>
-            <Link href="/#rsvp">Confirmar Presença</Link>
-          </Button>
+          <RsvpDialog>
+            <Button>Confirmar Presença</Button>
+          </RsvpDialog>
         </nav>
 
         <div className="md:hidden">
@@ -72,15 +82,16 @@ export default function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-lg font-medium"
+                    className="flex items-center gap-3 text-lg font-medium"
                     onClick={() => setSheetOpen(false)}
                   >
-                    {link.label}
+                    {link.icon}
+                    <span>{link.label}</span>
                   </Link>
                 ))}
-                 <Button asChild size="lg" className="mt-4">
-                    <Link href="/#rsvp" onClick={() => setSheetOpen(false)}>Confirmar Presença</Link>
-                </Button>
+                <RsvpDialog>
+                   <Button size="lg" className="mt-4 w-full" onClick={() => setSheetOpen(false)}>Confirmar Presença</Button>
+                </RsvpDialog>
               </nav>
             </SheetContent>
           </Sheet>

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import RsvpDialog from "./rsvp-dialog";
 
 export default function HeroSection() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero-couple');
@@ -32,9 +32,11 @@ export default function HeroSection() {
         <p className="text-xl md:text-2xl font-light">
           16 de Maio de 2026
         </p>
-        <Button asChild size="lg" className="mt-8">
-          <Link href="#rsvp">Confirmar Presença</Link>
-        </Button>
+        <RsvpDialog>
+          <Button size="lg" className="mt-8">
+            Confirmar Presença
+          </Button>
+        </RsvpDialog>
       </div>
     </section>
   );

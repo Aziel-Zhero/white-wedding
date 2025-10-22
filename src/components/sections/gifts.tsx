@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Gift } from "lucide-react";
+import RsvpDialog from "./rsvp-dialog";
 
 export default function GiftsSection() {
   return (
@@ -22,9 +22,11 @@ export default function GiftsSection() {
          <div id="rsvp" className="text-center mt-20">
             <h3 className="font-headline text-3xl font-bold">Confirme sua Presença</h3>
             <p className="mt-2 text-muted-foreground">Por favor, confirme sua presença até 16 de Abril de 2026.</p>
-            <Button size="lg" className="mt-6 animate-pulse">
-                <Link href="#">RSVP</Link>
-            </Button>
+            <RsvpDialog>
+              <Button size="lg" className="mt-6 animate-pulse">
+                  RSVP
+              </Button>
+            </RsvpDialog>
         </div>
       </div>
     </section>
