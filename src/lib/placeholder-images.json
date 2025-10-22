@@ -7,22 +7,52 @@
       "imageHint": "happy couple"
     },
     {
-      "id": "gifts-honeymoon",
-      "description": "A beautiful tropical beach for a honeymoon.",
-      "imageUrl": "https://images.unsplash.com/photo-1535262412227-85541e910204?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cm9waWNhbCUyMGJlYWNofGVufDB8fHx8MTc2MTA3MDQwMXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "tropical beach"
-    },
-    {
       "id": "gifts-cookware",
       "description": "A set of modern cookware.",
       "imageUrl": "https://images.unsplash.com/photo-1715690999094-670aa76bdecd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjb29rd2FyZXxlbnwwfHx8fDE3NjEwODkxNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "modern cookware"
     },
     {
-      "id": "gifts-appliances",
-      "description": "Modern kitchen appliances.",
-      "imageUrl": "https://images.unsplash.com/photo-1556185781-a47769abb7ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxraXRjaGVuJTIwYXBwbGlhbmNlc3xlbnwwfHx8fDE3NjEwNjAxMTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "kitchen appliances"
+      "id": "gift-paris-dinner",
+      "description": "Romantic dinner with a view of the Eiffel Tower in Paris.",
+      "imageUrl": "https://images.unsplash.com/photo-1542648870-4385792ed158?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxyb21hbnRpYyUyMGRpbm5lciUyMHBhcmlzfGVufDB8fHx8MTc2MTE4MjU3NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "romantic dinner"
+    },
+    {
+      "id": "gift-venice-gondola",
+      "description": "A couple on a gondola ride in Venice.",
+      "imageUrl": "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxnb25kb2xhJTIwdmVuaWNlfGVufDB8fHx8MTc2MTE4MjYyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gondola venice"
+    },
+    {
+      "id": "gift-maldives-hotel",
+      "description": "An overwater bungalow in the Maldives.",
+      "imageUrl": "https://images.unsplash.com/photo-1512100356356-de1b84283e18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWxkaXZlcyUyMGJ1bmdhbG93fGVufDB8fHx8MTc2MTE4MjY1Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "maldives bungalow"
+    },
+    {
+      "id": "gift-tuscany-cooking",
+      "description": "People enjoying a cooking class in Tuscany.",
+      "imageUrl": "https://images.unsplash.com/photo-1579532837568-4518a21eaf53?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb29raW5nJTIwY2xhc3MlMjB0dXNjYW55fGVufDB8fHx8MTc2MTE4MjY5NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cooking class"
+    },
+    {
+      "id": "gift-espresso-machine",
+      "description": "A modern espresso machine on a kitchen counter.",
+      "imageUrl": "https://images.unsplash.com/photo-1621873496035-3221b65b6f50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlc3ByZXNzbyUyMG1hY2hpbmV8ZW58MHx8fHwxNzYxMTgyNzMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "espresso machine"
+    },
+    {
+      "id": "gift-air-fryer",
+      "description": "An air fryer with food inside.",
+      "imageUrl": "https://images.unsplash.com/photo-1663738982315-d4a4f89c445a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhdXIlMjBmcnllcnxlbnwwfHx8fDE3NjExODI3ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "air fryer"
+    },
+    {
+      "id": "gift-tool-kit",
+      "description": "A complete tool kit in its box.",
+      "imageUrl": "https://images.unsplash.com/photo-1581152367836-a0b8a3423f5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0b29sJTIwa2l0fGVufDB8fHx8MTc2MTE4MjgwNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tool kit"
     }
   ]
 }

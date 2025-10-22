@@ -10,13 +10,12 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "#inicio", label: "Início" },
-  { href: "#cerimonia", label: "Cerimônia" },
-  { href: "#local", label: "Local" },
-  { href: "#presentes", label: "Presentes" },
+  { href: "/#inicio", label: "Início" },
+  { href: "/#cerimonia", label: "Cerimônia" },
+  { href: "/#local", label: "Local" },
+  { href: "/presentes", label: "Presentes" },
 ];
 
 export default function Header() {
@@ -25,7 +24,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="#inicio" className="flex items-center gap-2">
+        <Link href="/#inicio" className="flex items-center gap-2">
           <Heart className="h-6 w-6 text-primary" />
           <span className="font-headline text-xl font-bold">
             Eduarda & Aziel
@@ -43,7 +42,7 @@ export default function Header() {
             </Link>
           ))}
           <Button asChild>
-            <Link href="#rsvp">Confirmar Presença</Link>
+            <Link href="/#rsvp">Confirmar Presença</Link>
           </Button>
         </nav>
 
@@ -58,7 +57,7 @@ export default function Header() {
             <SheetContent side="right">
               <SheetHeader>
                 <Link
-                  href="#inicio"
+                  href="/#inicio"
                   className="flex items-center gap-2 mb-4"
                   onClick={() => setSheetOpen(false)}
                 >
@@ -80,7 +79,7 @@ export default function Header() {
                   </Link>
                 ))}
                  <Button asChild size="lg" className="mt-4">
-                    <Link href="#rsvp" onClick={() => setSheetOpen(false)}>Confirmar Presença</Link>
+                    <Link href="/#rsvp" onClick={() => setSheetOpen(false)}>Confirmar Presença</Link>
                 </Button>
               </nav>
             </SheetContent>
