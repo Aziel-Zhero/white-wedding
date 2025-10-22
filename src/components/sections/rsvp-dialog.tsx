@@ -22,17 +22,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper } from "lucide-react";
 
 const rsvpFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Por favor, insira seu nome completo.",
+  name: z.string({
+    required_error: "Por favor, selecione seu nome.",
   }),
 });
 
 type RsvpFormValues = z.infer<typeof rsvpFormSchema>;
+
+const guestList = [
+  "Thaina e Jeferson",
+  "Gustavo",
+  "Dona Bia e Sr Antonio",
+  "Cleiton e Camile",
+];
 
 export default function RsvpDialog({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -41,9 +54,6 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
 
   const form = useForm<RsvpFormValues>({
     resolver: zodResolver(rsvpFormSchema),
-    defaultValues: {
-      name: "",
-    },
   });
 
   function onSubmit(data: RsvpFormValues) {
@@ -105,10 +115,21 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Seu nome completo</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Digite seu nome" {...field} />
-                      </FormControl>
+                      <FormLabel>Seu nome</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione seu nome da lista" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {guestList.map((guest) => (
+                            <SelectItem key={guest} value={guest}>
+                              {guest}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
