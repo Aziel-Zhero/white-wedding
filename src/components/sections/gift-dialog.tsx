@@ -28,7 +28,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper, Upload, ClipboardCopy, Gift } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
-import { ScrollArea } from "../ui/scroll-area";
 
 interface GiftDialogProps {
   gift: GiftType;
@@ -113,7 +112,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         {isConfirmed ? (
            <div className="text-center p-8">
              <PartyPopper className="h-16 w-16 mx-auto text-primary" />
@@ -128,8 +127,8 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
              </Button>
            </div>
         ) : (
-          <ScrollArea className="max-h-[90vh] p-6">
-            <DialogHeader className="pr-6">
+          <div className="flex flex-col">
+            <DialogHeader>
               <DialogTitle className="font-headline text-2xl flex items-center gap-2">
                 <Gift className="h-6 w-6" /> Presentear: {gift.name}
               </DialogTitle>
@@ -150,7 +149,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                 </div>
             </div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pr-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="amount"
@@ -188,7 +187,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                 </DialogFooter>
               </form>
             </Form>
-            </ScrollArea>
+          </div>
         )}
       </DialogContent>
     </Dialog>
