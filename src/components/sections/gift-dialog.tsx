@@ -128,7 +128,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
            </div>
         ) : (
           <div className="grid md:grid-cols-2">
-            <div className="p-6 md:p-8 flex flex-col items-center justify-center bg-secondary/50 md:rounded-l-lg">
+            <div className="hidden md:flex flex-col items-center justify-center p-6 md:p-8 bg-secondary/50 md:rounded-l-lg">
                 {gift.image && (
                     <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border">
                          <Image
