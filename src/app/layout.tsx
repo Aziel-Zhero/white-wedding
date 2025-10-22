@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Unidos para Sempre',
+  title: 'Eduarda & Aziel - Unidos para Sempre',
   description: 'Nosso convite de casamento. Junte-se a nós para celebrar nosso amor!',
 };
 

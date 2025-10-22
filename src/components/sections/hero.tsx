@@ -27,7 +27,7 @@ export default function HeroSection() {
           Vamos nos casar!
         </h2>
         <h1 className="font-headline text-6xl md:text-8xl lg:text-9xl font-bold my-4">
-          Ana & João
+          Eduarda & Aziel
         </h1>
         <p className="text-xl md:text-2xl font-light">
           28 de Outubro de 2024

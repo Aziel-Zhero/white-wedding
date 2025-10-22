@@ -28,7 +28,7 @@ export default function Header() {
         <Link href="#inicio" className="flex items-center gap-2">
           <Heart className="h-6 w-6 text-primary" />
           <span className="font-headline text-xl font-bold">
-            Unidos para Sempre
+            Eduarda & Aziel
           </span>
         </Link>
 
@@ -64,7 +64,7 @@ export default function Header() {
                 >
                   <Heart className="h-6 w-6 text-primary" />
                   <span className="font-headline text-xl font-bold">
-                    Unidos para Sempre
+                    Eduarda & Aziel
                   </span>
                 </Link>
               </SheetHeader>
