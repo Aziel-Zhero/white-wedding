@@ -3,8 +3,8 @@ import { PlaceHolderImages, type ImagePlaceholder } from './placeholder-images';
 export type Gift = {
   name: string;
   description: string;
-  price: string;
-  link: string;
+  price: string; // This represents the full price, for display only in the card
+  link: string; // No longer used for navigation, but kept in type
   image: ImagePlaceholder | undefined;
 };
 

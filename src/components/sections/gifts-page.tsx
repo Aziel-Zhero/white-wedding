@@ -1,9 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Gift } from "lucide-react";
 import { AllGifts } from "@/lib/gifts-data";
+import GiftDialog from "./gift-dialog";
 
 export default function GiftsPageSection() {
   return (
@@ -38,9 +37,7 @@ export default function GiftsPageSection() {
                 <h3 className="text-xl font-bold font-headline">{gift.name}</h3>
                 <p className="mt-2 text-muted-foreground flex-grow">{gift.description}</p>
                  <p className="text-2xl font-bold text-primary mt-4">{gift.price}</p>
-                <Button asChild className="mt-4 w-full">
-                  <Link href={gift.link}>Presentear</Link>
-                </Button>
+                <GiftDialog gift={gift} />
               </CardContent>
             </Card>
           ))}
