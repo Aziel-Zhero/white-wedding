@@ -53,6 +53,9 @@ export default function GiftDialog({ gift }: { gift: Gift }) {
 
   const form = useForm<GiftFormValues>({
     resolver: zodResolver(giftFormSchema),
+    defaultValues: {
+      amount: undefined,
+    },
   });
 
   function onSubmit(data: GiftFormValues) {
@@ -139,7 +142,7 @@ export default function GiftDialog({ gift }: { gift: Gift }) {
                     <FormItem>
                       <FormLabel>Valor da Contribuição (R$)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Ex: 50,00" {...field} />
+                        <Input type="number" placeholder="Ex: 50,00" {...field} onChange={event => field.onChange(+event.target.value)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
