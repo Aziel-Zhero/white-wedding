@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,8 +26,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, PartyPopper, Upload, ClipboardCopy } from "lucide-react";
-import type { Gift } from "@/lib/gifts-data";
+import { CheckCircle, PartyPopper, Upload, ClipboardCopy, Gift } from "lucide-react";
+import type { Gift as GiftType } from "@/lib/gifts-data";
+
+interface GiftDialogProps {
+  gift: GiftType;
+  onConfirm: (giftId: string, amount: number) => void;
+  children: React.ReactNode;
+}
 
 const giftFormSchema = z.object({
   amount: z.coerce
@@ -46,10 +52,13 @@ const pixKey = "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6";
 const qrCodeImage = "https://picsum.photos/seed/qrcode/300/300";
 // -----------------
 
-export default function GiftDialog({ gift }: { gift: Gift }) {
+export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProps) {
   const [open, setOpen] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { toast } = useToast();
+
+  const remainingAmount = gift.totalPrice - gift.contributedAmount;
+  const isGifted = remainingAmount <= 0;
 
   const form = useForm<GiftFormValues>({
     resolver: zodResolver(giftFormSchema),
@@ -58,12 +67,20 @@ export default function GiftDialog({ gift }: { gift: Gift }) {
     },
   });
 
+  useEffect(() => {
+    if (open) {
+      form.setValue('amount', remainingAmount > 0 ? remainingAmount : undefined);
+    }
+  }, [open, remainingAmount, form]);
+
+
   function onSubmit(data: GiftFormValues) {
     console.log("Gifting data (placeholder):", {
         giftName: gift.name,
         ...data
     });
-    
+
+    onConfirm(gift.id, data.amount);
     setIsConfirmed(true);
 
     toast({
@@ -94,9 +111,7 @@ export default function GiftDialog({ gift }: { gift: Gift }) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="mt-4 w-full">Presentear</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         {isConfirmed ? (
            <div className="text-center p-8">
@@ -114,11 +129,11 @@ export default function GiftDialog({ gift }: { gift: Gift }) {
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="font-headline text-2xl">
-                Presentear: {gift.name}
+              <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                <Gift className="h-6 w-6" /> Presentear: {gift.name}
               </DialogTitle>
               <DialogDescription>
-                Contribua com qualquer valor para este presente.
+                Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar este presente. Contribua com qualquer valor!
               </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4 text-center">
@@ -142,7 +157,7 @@ export default function GiftDialog({ gift }: { gift: Gift }) {
                     <FormItem>
                       <FormLabel>Valor da Contribuição (R$)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Ex: 50,00" {...field} onChange={event => field.onChange(+event.target.value)} />
+                        <Input type="number" placeholder={`Faltam R$ ${remainingAmount.toFixed(2)}`} {...field} onChange={event => field.onChange(event.target.value === '' ? undefined : +event.target.value)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
