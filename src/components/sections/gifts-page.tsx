@@ -51,6 +51,7 @@ export default function GiftsPageSection() {
             const progress = (gift.contributedAmount / gift.totalPrice) * 100;
             const remaining = gift.totalPrice - gift.contributedAmount;
             const isGifted = remaining <= 0;
+            const isPartiallyGifted = gift.contributedAmount > 0 && !isGifted;
 
             return (
               <Card 
@@ -88,7 +89,7 @@ export default function GiftsPageSection() {
                       <span className="text-xs text-muted-foreground">
                         {formatCurrency(gift.contributedAmount)} / {formatCurrency(gift.totalPrice)}
                       </span>
-                       {!isGifted && (
+                       {isPartiallyGifted && (
                         <span className="text-xs font-bold text-primary animate-pulse">
                           Faltam {formatCurrency(remaining)}
                         </span>
