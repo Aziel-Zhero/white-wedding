@@ -1,10 +1,24 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import RsvpDialog from "./rsvp-dialog";
+import { CalendarPlus } from "lucide-react";
 
 export default function HeroSection() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero-couple');
+  
+  // Event details for Google Calendar
+  const event = {
+    title: "Casamento de Eduarda & Aziel",
+    startDate: "20260516T183000Z", // 15:30 in São Paulo (UTC-3)
+    endDate: "20260517T013000Z",   // 22:30 in São Paulo (UTC-3)
+    details: "Estamos nos casando! Junte-se a nós para celebrar nosso amor. Mais detalhes em nosso site.",
+    location: "Chácara Sonho Verde, Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena"
+  };
+
+  const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.startDate}/${event.endDate}&details=${encodeURIComponent(event.details)}&location=${encodeURIComponent(event.location)}`;
+
 
   return (
     <section
@@ -32,11 +46,19 @@ export default function HeroSection() {
         <p className="text-xl md:text-2xl font-light">
           16 de Maio de 2026
         </p>
-        <RsvpDialog>
-          <Button size="lg" className="mt-8">
-            Confirmar Presença
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          <Button asChild size="lg">
+            <Link href={googleCalendarUrl} target="_blank" rel="noopener noreferrer">
+              <CalendarPlus className="mr-2" />
+              Save the Date
+            </Link>
           </Button>
-        </RsvpDialog>
+          <RsvpDialog>
+            <Button size="lg" variant="secondary">
+              Confirmar Presença
+            </Button>
+          </RsvpDialog>
+        </div>
       </div>
     </section>
   );
