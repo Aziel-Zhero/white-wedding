@@ -61,15 +61,16 @@ export default function GiftsPageSection() {
                   isGifted && "opacity-60"
                 )}
               >
-                {gift.image && (
-                  <div className="aspect-square relative">
-                    <Image
-                      src={gift.image.imageUrl}
-                      alt={gift.name}
-                      fill
-                      className="object-cover"
-                      data-ai-hint={gift.image.imageHint}
-                    />
+                <div className="aspect-square relative">
+                    {gift.image && (
+                        <Image
+                        src={gift.image.imageUrl}
+                        alt={gift.name}
+                        fill
+                        className="object-cover"
+                        data-ai-hint={gift.image.imageHint}
+                        />
+                    )}
                     {isGifted && (
                         <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center">
                             <div className="text-center text-secondary-foreground p-4 rounded-lg">
@@ -78,8 +79,12 @@ export default function GiftsPageSection() {
                             </div>
                         </div>
                     )}
-                  </div>
-                )}
+                    {isPartiallyGifted && (
+                        <div className="absolute top-0 left-0 right-0 bg-primary/90 text-primary-foreground text-center py-1 font-bold text-sm animate-pulse">
+                            Help, My Friend!
+                        </div>
+                    )}
+                </div>
                 <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
                   <h3 className="text-xl font-bold font-headline">{gift.name}</h3>
                   <p className="mt-2 text-muted-foreground text-sm flex-grow">{gift.description}</p>
@@ -100,7 +105,7 @@ export default function GiftsPageSection() {
 
                   <GiftDialog gift={gift} onConfirm={handleConfirmGift}>
                     <Button className="mt-4 w-full" disabled={isGifted}>
-                      {isGifted ? "Obrigado!" : "Presentear"}
+                      {isGifted ? "Obrigado!" : (isPartiallyGifted ? "Interar na vaquinha!" : "Presentear")}
                     </Button>
                   </GiftDialog>
 
