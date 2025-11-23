@@ -58,7 +58,7 @@ type GiftFormValues = z.infer<typeof giftFormSchema>;
 
 // --- Mock Data ---
 const pixKey = "00020126440014br.gov.bcb.pix0122aziel_1994@hotmail.com5204000053039865802BR5924AZIELASAFFEOLIVEIRAPAULA6009Sao Paulo610901227-20062230519daqr22254342532843163048626";
-const qrCodeImage = "https://picsum.photos/seed/qrcode/300/300";
+const qrCodeImage = "/qrcode.jpeg";
 const guestList = [
   "Thaina e Jeferson",
   "Gustavo",
@@ -178,11 +178,11 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
                 <div className="py-4 space-y-4 text-center">
                     <div className="relative w-40 h-40 mx-auto border-4 border-primary rounded-lg overflow-hidden">
-                        <Image src={qrCodeImage} alt="QR Code PIX" layout="fill" objectFit="cover" />
+                        <Image src={qrCodeImage} alt="QR Code PIX" width={300} height={300} objectFit="cover" />
                     </div>
                     <p className="text-sm text-muted-foreground">Escaneie o QR Code acima ou copie a chave.</p>
                     <div className="flex items-center justify-center p-3 bg-secondary rounded-md">
-                        <code className="text-sm text-secondary-foreground break-all">{pixKey}</code>
+                        <code className="text-xs text-secondary-foreground break-all">{pixKey}</code>
                         <Button variant="ghost" size="icon" className="ml-2 h-8 w-8" onClick={copyPixKey}>
                             <ClipboardCopy className="h-4 w-4" />
                         </Button>
