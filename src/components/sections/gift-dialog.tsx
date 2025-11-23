@@ -57,7 +57,7 @@ const giftFormSchema = z.object({
 type GiftFormValues = z.infer<typeof giftFormSchema>;
 
 // --- Mock Data ---
-const pixKey = "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6";
+const pixKey = "00020126440014br.gov.bcb.pix0122aziel_1994@hotmail.com5204000053039865802BR5924AZIELASAFFEOLIVEIRAPAULA6009Sao Paulo610901227-20062230519daqr22254342532843163048626";
 const qrCodeImage = "https://picsum.photos/seed/qrcode/300/300";
 const guestList = [
   "Thaina e Jeferson",
