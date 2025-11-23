@@ -69,7 +69,8 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
   useEffect(() => {
     if (open) {
-      form.setValue('amount', remainingAmount > 0 ? remainingAmount : undefined);
+      const defaultAmount = remainingAmount > 0 ? remainingAmount : undefined;
+      form.setValue('amount', defaultAmount);
     }
   }, [open, remainingAmount, form]);
 

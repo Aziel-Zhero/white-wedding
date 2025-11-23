@@ -81,7 +81,7 @@ export default function GiftsPageSection() {
                     )}
                     {isPartiallyGifted && (
                         <div className="absolute top-0 left-0 right-0 bg-destructive/90 text-destructive-foreground text-center py-1 font-bold text-sm animate-pulse">
-                            Help, My Friend!
+                            Ajude os noivos!
                         </div>
                     )}
                 </div>
