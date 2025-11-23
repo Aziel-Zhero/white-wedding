@@ -24,9 +24,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, PartyPopper, Upload, ClipboardCopy, Gift } from "lucide-react";
+import { CheckCircle, PartyPopper, ClipboardCopy, Gift } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
 import { Separator } from "../ui/separator";
 
@@ -37,6 +44,7 @@ interface GiftDialogProps {
 }
 
 const giftFormSchema = z.object({
+  name: z.string({ required_error: "Por favor, selecione seu nome." }),
   amount: z.coerce
     .number({
       required_error: "Por favor, insira um valor.",
@@ -51,6 +59,13 @@ type GiftFormValues = z.infer<typeof giftFormSchema>;
 // --- Mock Data ---
 const pixKey = "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6";
 const qrCodeImage = "https://picsum.photos/seed/qrcode/300/300";
+const guestList = [
+  "Thaina e Jeferson",
+  "Gustavo",
+  "Dona Bia e Sr Antonio",
+  "Cleiton e Camile",
+  "Anônimo",
+];
 // -----------------
 
 export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProps) {
@@ -64,6 +79,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
     resolver: zodResolver(giftFormSchema),
     defaultValues: {
       amount: undefined,
+      name: undefined,
     },
   });
 
@@ -78,6 +94,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   function onSubmit(data: GiftFormValues) {
     console.log("Gifting data (placeholder):", {
         giftName: gift.name,
+        from: data.name,
         ...data
     });
 
@@ -86,7 +103,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
     toast({
         title: "Contribuição enviada!",
-        description: `Obrigado por presentear com R$ ${data.amount.toFixed(2)} para "${gift.name}"!`,
+        description: `Obrigado, ${data.name}, por presentear com R$ ${data.amount.toFixed(2)} para "${gift.name}"!`,
         duration: 5000,
     });
   }
@@ -174,6 +191,30 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-auto">
+                     <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seu nome</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione seu nome da lista" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {guestList.map((guest) => (
+                                <SelectItem key={guest} value={guest}>
+                                  {guest}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                     control={form.control}
                     name="amount"
