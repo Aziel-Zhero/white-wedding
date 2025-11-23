@@ -1,4 +1,5 @@
 import { Heart } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -12,6 +13,11 @@ export default function Footer() {
         <p className="text-sm text-muted-foreground mt-2">
           &copy; {currentYear} Unidos para Sempre. Todos os direitos reservados.
         </p>
+        <div className="mt-4 text-sm">
+          <Link href="/login" className="text-muted-foreground hover:text-primary transition-colors">
+            Área dos Noivos
+          </Link>
+        </div>
       </div>
     </footer>
   );
