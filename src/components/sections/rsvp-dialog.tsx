@@ -83,7 +83,7 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[90%] max-w-md rounded-lg">
         {isConfirmed ? (
            <div className="text-center p-8">
              <PartyPopper className="h-16 w-16 mx-auto text-primary" />

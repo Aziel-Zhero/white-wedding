@@ -37,13 +37,13 @@ export default function HeroSection() {
       )}
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative z-10 flex flex-col items-center p-4 animate-fade-in-up">
-        <h2 className="font-headline text-2xl md:text-3xl tracking-widest uppercase">
+        <h2 className="font-headline text-xl md:text-3xl tracking-widest uppercase">
           Vamos nos casar!
         </h2>
-        <h1 className="font-headline text-6xl md:text-8xl lg:text-9xl font-bold my-4">
+        <h1 className="font-headline text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold my-4">
           Eduarda & Aziel
         </h1>
-        <p className="text-xl md:text-2xl font-light">
+        <p className="text-lg md:text-2xl font-light">
           16 de Maio de 2026
         </p>
         <div className="flex flex-col sm:flex-row gap-4 mt-8">

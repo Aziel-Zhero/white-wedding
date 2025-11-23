@@ -35,7 +35,7 @@ export default function SurpriseDialog() {
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent className="max-w-sm text-center">
+      <AlertDialogContent className="w-[90%] max-w-sm rounded-lg text-center">
         <AlertDialogHeader className="items-center">
             <PartyPopper className="h-14 w-14 text-primary animate-bounce" />
           <AlertDialogTitle className="font-headline text-3xl mt-4">Surpresa!</AlertDialogTitle>
