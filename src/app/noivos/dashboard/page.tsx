@@ -8,7 +8,9 @@ import {
   DollarSign,
   UserPlus,
   ListPlus,
+  MoreHorizontal,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -22,6 +24,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -149,12 +157,20 @@ export default function DashboardPage() {
                               {guest.email}
                             </TableCell>
                             <TableCell>
-                              <Badge variant={guest.status === 'Confirmado' ? 'default' : 'secondary'} className={guest.status === 'Confirmado' ? 'bg-green-600' : ''}>{guest.status}</Badge>
+                              <Badge variant={guest.status === 'Confirmado' ? 'default' : 'secondary'} className={guest.status === 'Confirmado' ? 'bg-green-600 hover:bg-green-700' : ''}>{guest.status}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button variant="ghost" size="icon">
-                                ...
-                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem>Editar</DropdownMenuItem>
+                                  <DropdownMenuItem className="text-destructive">Remover</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -193,7 +209,7 @@ export default function DashboardPage() {
                               {guest.name}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Badge className="bg-green-600">Confirmado</Badge>
+                              <Badge className="bg-green-600 hover:bg-green-700">Confirmado</Badge>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -354,6 +370,7 @@ export default function DashboardPage() {
                         <Table>
                           <TableHeader>
                             <TableRow>
+                              <TableHead className="w-[80px] hidden sm:table-cell">Imagem</TableHead>
                               <TableHead>Produto</TableHead>
                               <TableHead>Preço</TableHead>
                               <TableHead>Arrecadado</TableHead>
@@ -363,6 +380,17 @@ export default function DashboardPage() {
                           <TableBody>
                             {AllGifts.map((gift) => (
                               <TableRow key={gift.id}>
+                                <TableCell className="hidden sm:table-cell">
+                                  {gift.image && (
+                                    <Image
+                                      src={gift.image.imageUrl}
+                                      alt={gift.name}
+                                      width={64}
+                                      height={64}
+                                      className="rounded-md object-cover aspect-square"
+                                    />
+                                  )}
+                                </TableCell>
                                 <TableCell className="font-medium">
                                   {gift.name}
                                 </TableCell>
@@ -379,9 +407,17 @@ export default function DashboardPage() {
                                   })}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                  <Button variant="ghost" size="icon">
-                                    ...
-                                  </Button>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                                      <DropdownMenuItem className="text-destructive">Remover</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -398,5 +434,3 @@ export default function DashboardPage() {
     </Tabs>
   );
 }
-
-    
