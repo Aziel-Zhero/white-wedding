@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AllGifts } from "@/lib/gifts-data";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Mock Data
 const confirmedGuests = [
@@ -63,30 +64,31 @@ export default function DashboardPage() {
   return (
     <Tabs defaultValue="presenca" className="flex min-h-screen w-full flex-col bg-muted/40">
       <header className="sticky top-0 z-30 flex h-auto flex-col items-start gap-4 border-b bg-background px-4 py-4 sm:px-6">
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Heart className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-semibold font-headline">Painel dos Noivos</h1>
+            <h1 className="text-lg sm:text-xl font-semibold font-headline">Painel dos Noivos</h1>
           </div>
           <Button variant="outline" size="sm" asChild>
             <Link href="/">
               <LogOut className="mr-2 h-4 w-4" />
-              Sair e voltar ao site
+              <span className="hidden sm:inline">Sair e voltar ao site</span>
+              <span className="inline sm:hidden">Sair</span>
             </Link>
           </Button>
         </div>
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 sm:max-w-xl">
-          <TabsTrigger value="presenca">
-            <Users className="mr-2 h-4 w-4" />
-            Lista de Presença
+        <TabsList className="grid w-full grid-cols-1 h-auto sm:grid-cols-3 sm:max-w-xl">
+          <TabsTrigger value="presenca" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span>Lista de Presença</span>
           </TabsTrigger>
-          <TabsTrigger value="presentes">
-            <Gift className="mr-2 h-4 w-4" />
-            Presentes Recebidos
+          <TabsTrigger value="presentes" className="flex items-center gap-2">
+            <Gift className="h-4 w-4" />
+            <span>Presentes Recebidos</span>
           </TabsTrigger>
-          <TabsTrigger value="gerenciar-presentes">
-            <ListPlus className="mr-2 h-4 w-4" />
-            Gerenciar Presentes
+          <TabsTrigger value="gerenciar-presentes" className="flex items-center gap-2">
+            <ListPlus className="h-4 w-4" />
+            <span>Gerenciar Presentes</span>
           </TabsTrigger>
         </TabsList>
       </header>
@@ -104,7 +106,7 @@ export default function DashboardPage() {
                   Pendentes ({pendingGuests.length})
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="confirmed">
+              <TabsContent value="confirmed" className="mt-4">
                 <Card>
                   <CardContent className="p-0">
                     <Table>
@@ -130,7 +132,7 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="pending">
+              <TabsContent value="pending" className="mt-4">
                 <Card>
                   <CardContent className="p-0">
                     <Table>
@@ -215,15 +217,15 @@ export default function DashboardPage() {
           </TabsContent>
           
           <TabsContent value="gerenciar-presentes" className="mt-0">
-             <div className="flex items-center justify-between mb-4">
+             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
               <h2 className="text-2xl font-headline font-bold flex items-center gap-2">
                 <ListPlus /> Gerenciar Presentes
               </h2>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button>Adicionar Novo Presente</Button>
+                  <Button className="w-full sm:w-auto">Adicionar Novo Presente</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="w-[90vw] max-w-md rounded-lg">
                   <DialogHeader>
                     <DialogTitle>Adicionar Novo Presente</DialogTitle>
                     <DialogDescription>
@@ -231,37 +233,39 @@ export default function DashboardPage() {
                       adicionar à lista.
                     </DialogDescription>
                   </DialogHeader>
-                  <form className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="gift-name">Nome do Produto</Label>
-                      <Input id="gift-name" placeholder="Ex: Jogo de Panelas" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="gift-description">Descrição</Label>
-                      <Textarea
-                        id="gift-description"
-                        placeholder="Descreva o presente..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="gift-price">Preço (R$)</Label>
-                      <Input
-                        id="gift-price"
-                        type="number"
-                        placeholder="Ex: 250.00"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="gift-image">URL da Imagem</Label>
-                      <Input
-                        id="gift-image"
-                        placeholder="https://exemplo.com/imagem.jpg"
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">Salvar Presente</Button>
-                    </DialogFooter>
-                  </form>
+                  <ScrollArea className="h-[60vh] sm:h-auto">
+                    <form className="space-y-4 px-4 py-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="gift-name">Nome do Produto</Label>
+                        <Input id="gift-name" placeholder="Ex: Jogo de Panelas" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="gift-description">Descrição</Label>
+                        <Textarea
+                          id="gift-description"
+                          placeholder="Descreva o presente..."
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="gift-price">Preço (R$)</Label>
+                        <Input
+                          id="gift-price"
+                          type="number"
+                          placeholder="Ex: 250.00"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="gift-image">URL da Imagem</Label>
+                        <Input
+                          id="gift-image"
+                          placeholder="https://exemplo.com/imagem.jpg"
+                        />
+                      </div>
+                      <DialogFooter className="!mt-6">
+                        <Button type="submit">Salvar Presente</Button>
+                      </DialogFooter>
+                    </form>
+                  </ScrollArea>
                 </DialogContent>
               </Dialog>
             </div>
@@ -270,7 +274,7 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Nome do Produto</TableHead>
+                      <TableHead>Produto</TableHead>
                       <TableHead>Preço</TableHead>
                       <TableHead>Arrecadado</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
