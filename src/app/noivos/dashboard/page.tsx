@@ -6,7 +6,7 @@ import {
   Gift,
   LogOut,
   DollarSign,
-  ListChecks,
+  UserPlus,
   ListPlus,
 } from "lucide-react";
 import Link from "next/link";
@@ -38,14 +38,16 @@ import { AllGifts } from "@/lib/gifts-data";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Mock Data
-const confirmedGuests = [
-  { id: 1, name: "Thaina e Jeferson", status: "Confirmado" },
-  { id: 2, name: "Gustavo", status: "Confirmado" },
+const allGuests = [
+  { id: 1, name: "Thaina e Jeferson", email: "thaina.jeferson@example.com", status: "Confirmado" },
+  { id: 2, name: "Gustavo", email: "gustavo@example.com", status: "Confirmado" },
+  { id: 3, name: "Dona Bia e Sr Antonio", email: "bia.antonio@example.com", status: "Pendente" },
+  { id: 4, name: "Cleiton e Camile", email: "cleiton.camile@example.com", status: "Pendente" },
 ];
-const pendingGuests = [
-  { id: 1, name: "Dona Bia e Sr Antonio", status: "Pendente" },
-  { id: 2, name: "Cleiton e Camile", status: "Pendente" },
-];
+
+const confirmedGuests = allGuests.filter(g => g.status === 'Confirmado');
+const pendingGuests = allGuests.filter(g => g.status === 'Pendente');
+
 
 const receivedGifts = [
   {
@@ -62,7 +64,7 @@ const totalGiftValue = receivedGifts.reduce((acc, gift) => acc + gift.amount, 0)
 
 export default function DashboardPage() {
   return (
-    <Tabs defaultValue="presenca" className="flex min-h-screen w-full flex-col bg-muted/40">
+    <Tabs defaultValue="convidados" className="flex min-h-screen w-full flex-col bg-muted/40">
       <header className="sticky top-0 z-30 flex h-auto flex-col items-start gap-4 border-b bg-background px-4 py-4 sm:px-6">
         <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -77,26 +79,93 @@ export default function DashboardPage() {
             </Link>
           </Button>
         </div>
-        <TabsList className="grid w-full grid-cols-1 h-auto sm:grid-cols-3 sm:max-w-xl">
+        <TabsList className="grid w-full grid-cols-2 h-auto sm:grid-cols-3 sm:max-w-2xl">
+          <TabsTrigger value="convidados" className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
+            <span>Convidados</span>
+          </TabsTrigger>
           <TabsTrigger value="presenca" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span>Lista de Presença</span>
           </TabsTrigger>
           <TabsTrigger value="presentes" className="flex items-center gap-2">
             <Gift className="h-4 w-4" />
-            <span>Presentes Recebidos</span>
-          </TabsTrigger>
-          <TabsTrigger value="gerenciar-presentes" className="flex items-center gap-2">
-            <ListPlus className="h-4 w-4" />
-            <span>Gerenciar Presentes</span>
+            <span>Presentes</span>
           </TabsTrigger>
         </TabsList>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+          <TabsContent value="convidados" className="mt-0">
+             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+              <h2 className="text-2xl font-headline font-bold flex items-center gap-2">
+                <UserPlus /> Gerenciar Convidados
+              </h2>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto">Adicionar Convidado</Button>
+                </DialogTrigger>
+                <DialogContent className="w-[90vw] max-w-md rounded-lg">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Novo Convidado</DialogTitle>
+                    <DialogDescription>
+                      Preencha os detalhes do novo convidado. Ele aparecerá na lista de presença como pendente.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form className="space-y-4 px-1 py-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="guest-name">Nome do Convidado</Label>
+                      <Input id="guest-name" placeholder="Ex: João da Silva" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="guest-email">Email (Opcional)</Label>
+                      <Input id="guest-email" type="email" placeholder="Ex: joao@email.com" />
+                    </div>
+                    <DialogFooter className="!mt-6">
+                      <Button type="submit">Salvar Convidado</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+             <Card>
+              <CardContent className="p-0">
+                 <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {allGuests.map((guest) => (
+                          <TableRow key={guest.id}>
+                            <TableCell className="font-medium">
+                              {guest.name}
+                            </TableCell>
+                             <TableCell className="text-muted-foreground">
+                              {guest.email}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={guest.status === 'Confirmado' ? 'default' : 'secondary'} className={guest.status === 'Confirmado' ? 'bg-green-600' : ''}>{guest.status}</Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="icon">
+                                ...
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="presenca" className="mt-0">
-            <h2 className="text-2xl font-headline font-bold mb-4 flex items-center gap-2">
-              <ListChecks /> Lista de Presença
-            </h2>
             <Tabs defaultValue="confirmed">
               <TabsList className="grid w-full grid-cols-2 max-w-md">
                 <TabsTrigger value="confirmed">
@@ -109,6 +178,7 @@ export default function DashboardPage() {
               <TabsContent value="confirmed" className="mt-4">
                 <Card>
                   <CardContent className="p-0">
+                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -123,38 +193,41 @@ export default function DashboardPage() {
                               {guest.name}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Badge>{guest.status}</Badge>
+                              <Badge className="bg-green-600">Confirmado</Badge>
                             </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
               <TabsContent value="pending" className="mt-4">
                 <Card>
                   <CardContent className="p-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Nome</TableHead>
-                          <TableHead className="text-right">Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {pendingGuests.map((guest) => (
-                          <TableRow key={guest.id}>
-                            <TableCell className="font-medium">
-                              {guest.name}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Badge variant="secondary">{guest.status}</Badge>
-                            </TableCell>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Nome</TableHead>
+                            <TableHead className="text-right">Status</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {pendingGuests.map((guest) => (
+                            <TableRow key={guest.id}>
+                              <TableCell className="font-medium">
+                                {guest.name}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Badge variant="secondary">{guest.status}</Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -162,155 +235,168 @@ export default function DashboardPage() {
           </TabsContent>
 
           <TabsContent value="presentes" className="mt-0">
-             <h2 className="text-2xl font-headline font-bold mb-4 flex items-center gap-2">
-                <Gift /> Presentes Recebidos
-            </h2>
-            <Card className="mb-6">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Arrecadado
-                </CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {totalGiftValue.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+             <Tabs defaultValue="recebidos">
+              <TabsList className="grid w-full grid-cols-2 max-w-md">
+                <TabsTrigger value="recebidos">Presentes Recebidos</TabsTrigger>
+                <TabsTrigger value="gerenciar">Gerenciar Lista</TabsTrigger>
+              </TabsList>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Histórico de Contribuições</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Presente</TableHead>
-                      <TableHead>De</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {receivedGifts.map((gift) => (
-                      <TableRow key={gift.id}>
-                        <TableCell className="font-medium">
-                          {gift.name}
-                        </TableCell>
-                        <TableCell>{gift.from}</TableCell>
-                        <TableCell className="text-right">
-                          {gift.amount.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+              <TabsContent value="recebidos" className="mt-4">
+                <Card className="mb-6">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Total Arrecadado
+                    </CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {totalGiftValue.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Histórico de Contribuições</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                     <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Presente</TableHead>
+                              <TableHead>De</TableHead>
+                              <TableHead className="text-right">Valor</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {receivedGifts.map((gift) => (
+                              <TableRow key={gift.id}>
+                                <TableCell className="font-medium">
+                                  {gift.name}
+                                </TableCell>
+                                <TableCell>{gift.from}</TableCell>
+                                <TableCell className="text-right">
+                                  {gift.amount.toLocaleString("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL",
+                                  })}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="gerenciar" className="mt-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+                  <h2 className="text-xl font-headline font-bold flex items-center gap-2">
+                    <ListPlus /> Itens da sua Lista
+                  </h2>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="w-full sm:w-auto">Adicionar Novo Presente</Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[90vw] max-w-md rounded-lg">
+                      <DialogHeader>
+                        <DialogTitle>Adicionar Novo Presente</DialogTitle>
+                        <DialogDescription>
+                          Preencha os detalhes do novo presente que você deseja
+                          adicionar à lista.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <ScrollArea className="h-[60vh] sm:h-auto -mx-6 px-6">
+                        <form className="space-y-4 px-1 py-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="gift-name">Nome do Produto</Label>
+                            <Input id="gift-name" placeholder="Ex: Jogo de Panelas" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="gift-description">Descrição</Label>
+                            <Textarea
+                              id="gift-description"
+                              placeholder="Descreva o presente..."
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="gift-price">Preço (R$)</Label>
+                            <Input
+                              id="gift-price"
+                              type="number"
+                              placeholder="Ex: 250.00"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="gift-image">URL da Imagem</Label>
+                            <Input
+                              id="gift-image"
+                              placeholder="https://exemplo.com/imagem.jpg"
+                            />
+                          </div>
+                           <DialogFooter className="!mt-6 pt-4 border-t">
+                            <Button type="submit" className="w-full">Salvar Presente</Button>
+                          </DialogFooter>
+                        </form>
+                      </ScrollArea>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Produto</TableHead>
+                              <TableHead>Preço</TableHead>
+                              <TableHead>Arrecadado</TableHead>
+                              <TableHead className="text-right">Ações</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {AllGifts.map((gift) => (
+                              <TableRow key={gift.id}>
+                                <TableCell className="font-medium">
+                                  {gift.name}
+                                </TableCell>
+                                <TableCell>
+                                  {gift.totalPrice.toLocaleString("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL",
+                                  })}
+                                </TableCell>
+                                <TableCell>
+                                  {gift.contributedAmount.toLocaleString("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL",
+                                  })}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="icon">
+                                    ...
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
           
-          <TabsContent value="gerenciar-presentes" className="mt-0">
-             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
-              <h2 className="text-2xl font-headline font-bold flex items-center gap-2">
-                <ListPlus /> Gerenciar Presentes
-              </h2>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="w-full sm:w-auto">Adicionar Novo Presente</Button>
-                </DialogTrigger>
-                <DialogContent className="w-[90vw] max-w-md rounded-lg">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar Novo Presente</DialogTitle>
-                    <DialogDescription>
-                      Preencha os detalhes do novo presente que você deseja
-                      adicionar à lista.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ScrollArea className="h-[60vh] sm:h-auto">
-                    <form className="space-y-4 px-4 py-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="gift-name">Nome do Produto</Label>
-                        <Input id="gift-name" placeholder="Ex: Jogo de Panelas" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="gift-description">Descrição</Label>
-                        <Textarea
-                          id="gift-description"
-                          placeholder="Descreva o presente..."
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="gift-price">Preço (R$)</Label>
-                        <Input
-                          id="gift-price"
-                          type="number"
-                          placeholder="Ex: 250.00"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="gift-image">URL da Imagem</Label>
-                        <Input
-                          id="gift-image"
-                          placeholder="https://exemplo.com/imagem.jpg"
-                        />
-                      </div>
-                      <DialogFooter className="!mt-6">
-                        <Button type="submit">Salvar Presente</Button>
-                      </DialogFooter>
-                    </form>
-                  </ScrollArea>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Produto</TableHead>
-                      <TableHead>Preço</TableHead>
-                      <TableHead>Arrecadado</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {AllGifts.map((gift) => (
-                      <TableRow key={gift.id}>
-                        <TableCell className="font-medium">
-                          {gift.name}
-                        </TableCell>
-                        <TableCell>
-                          {gift.totalPrice.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          {gift.contributedAmount.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          })}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="icon">
-                            ...
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
       </main>
     </Tabs>
   );
 }
+
+    
