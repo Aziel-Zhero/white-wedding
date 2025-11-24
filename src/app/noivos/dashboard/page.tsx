@@ -61,37 +61,37 @@ const totalGiftValue = receivedGifts.reduce((acc, gift) => acc + gift.amount, 0)
 
 export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      <header className="sticky top-0 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6">
-        <div className="flex items-center gap-2">
-          <Heart className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-semibold font-headline">Painel dos Noivos</h1>
+    <Tabs defaultValue="presenca" className="flex min-h-screen w-full flex-col bg-muted/40">
+      <header className="sticky top-0 z-30 flex h-auto flex-col items-start gap-4 border-b bg-background px-4 py-4 sm:px-6">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Heart className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-semibold font-headline">Painel dos Noivos</h1>
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/">
+              <LogOut className="mr-2 h-4 w-4" />
+              Sair e voltar ao site
+            </Link>
+          </Button>
         </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/">
-            <LogOut className="mr-2 h-4 w-4" />
-            Sair e voltar ao site
-          </Link>
-        </Button>
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 sm:max-w-xl">
+          <TabsTrigger value="presenca">
+            <Users className="mr-2 h-4 w-4" />
+            Lista de Presença
+          </TabsTrigger>
+          <TabsTrigger value="presentes">
+            <Gift className="mr-2 h-4 w-4" />
+            Presentes Recebidos
+          </TabsTrigger>
+          <TabsTrigger value="gerenciar-presentes">
+            <ListPlus className="mr-2 h-4 w-4" />
+            Gerenciar Presentes
+          </TabsTrigger>
+        </TabsList>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        <Tabs defaultValue="presenca" className="flex-1">
-          <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
-            <TabsTrigger value="presenca">
-              <Users className="mr-2 h-4 w-4" />
-              Lista de Presença
-            </TabsTrigger>
-            <TabsTrigger value="presentes">
-              <Gift className="mr-2 h-4 w-4" />
-              Presentes Recebidos
-            </TabsTrigger>
-            <TabsTrigger value="gerenciar-presentes">
-              <ListPlus className="mr-2 h-4 w-4" />
-              Gerenciar Presentes
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="presenca" className="mt-6">
+          <TabsContent value="presenca" className="mt-0">
             <h2 className="text-2xl font-headline font-bold mb-4 flex items-center gap-2">
               <ListChecks /> Lista de Presença
             </h2>
@@ -159,7 +159,7 @@ export default function DashboardPage() {
             </Tabs>
           </TabsContent>
 
-          <TabsContent value="presentes" className="mt-6">
+          <TabsContent value="presentes" className="mt-0">
              <h2 className="text-2xl font-headline font-bold mb-4 flex items-center gap-2">
                 <Gift /> Presentes Recebidos
             </h2>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
           
-          <TabsContent value="gerenciar-presentes" className="mt-6">
+          <TabsContent value="gerenciar-presentes" className="mt-0">
              <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-headline font-bold flex items-center gap-2">
                 <ListPlus /> Gerenciar Presentes
@@ -306,8 +306,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
       </main>
-    </div>
+    </Tabs>
   );
 }
