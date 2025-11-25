@@ -31,7 +31,7 @@ service cloud.firestore {
       }
       
       match /rsvps/{rsvpId} {
-        allow read: if isOwner(coupleId);
+        allow read: if true; // Allow reading RSVPs, was isOwner(coupleId)
         allow create: if true; // Anyone can RSVP
       }
     }
