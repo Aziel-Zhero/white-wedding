@@ -24,7 +24,7 @@ export default function GiftsSection() {
             <p className="mt-2 text-muted-foreground">Por favor, confirme sua presença até 16 de Abril de 2026.</p>
             <RsvpDialog>
               <Button size="lg" className="mt-6 animate-pulse">
-                  RSVP
+                  Confirmar minha presença
               </Button>
             </RsvpDialog>
         </div>
