@@ -14,13 +14,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   addDoc,
   collection,
   doc,
   deleteDoc,
   updateDoc,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError, useUser } from "@/firebase";
 import { coupleId } from "@/lib/couple-data";
@@ -101,7 +103,30 @@ export default function DashboardPage() {
   const { data: allGuests, isLoading: isLoadingGuests } = useCollection(guestsRef);
   const { data: gifts, isLoading: isLoadingGifts } = useCollection<GiftType>(giftsRef);
   const { data: rsvps, isLoading: isLoadingRsvps } = useCollection(rsvpsRef);
-
+  
+  // Ensure couple document exists
+  useEffect(() => {
+    if (user && firestore) {
+      const coupleDocRef = doc(firestore, 'couples', coupleId);
+      const ensureCoupleDoc = async () => {
+        const docSnap = await getDoc(coupleDocRef);
+        if (!docSnap.exists()) {
+          // Document doesn't exist, create it with the ownerId
+          try {
+            await setDoc(coupleDocRef, { ownerId: user.uid }, { merge: true });
+          } catch (error) {
+             const permissionError = new FirestorePermissionError({
+                path: coupleDocRef.path,
+                operation: 'create',
+                requestResourceData: { ownerId: user.uid },
+            });
+            errorEmitter.emit('permission-error', permissionError);
+          }
+        }
+      };
+      ensureCoupleDoc();
+    }
+  }, [user, firestore]);
 
   // --- Computed Data ---
   const confirmedGuests = useMemo(() => rsvps?.map(r => ({...r, status: 'Confirmado'})) ?? [], [rsvps]);
@@ -653,5 +678,7 @@ export default function DashboardPage() {
       </Tabs>
     </TooltipProvider>
   );
+
+    
 
     
