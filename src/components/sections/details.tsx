@@ -28,7 +28,7 @@ export default function DetailsSection() {
               <p>às 15:30 horas</p>
               <Separator className="my-4" />
               <p className="font-semibold">Chácara Sonho Verde</p>
-              <p>Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
+              <p>Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena, Caçapava - SP</p>
             </CardContent>
           </Card>
 
@@ -44,7 +44,7 @@ export default function DetailsSection() {
               <p>após a cerimônia</p>
               <Separator className="my-4" />
               <p className="font-semibold">Chácara Sonho Verde</p>
-              <p>Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
+              <p>Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena, Caçapava - SP</p>
             </CardContent>
           </Card>
         </div>

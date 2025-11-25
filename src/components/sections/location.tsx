@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 
 export default function LocationSection() {
-  const address = "Chácara Sonho Verde, Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena";
+  const address = "Chácara Sonho Verde, Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena, Caçapava - SP";
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
@@ -19,7 +19,7 @@ export default function LocationSection() {
           </p>
           <div className="mt-6 text-lg">
             <p className="font-semibold">Chácara Sonho Verde</p>
-            <p className="text-muted-foreground">Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
+            <p className="text-muted-foreground">Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena, Caçapava - SP</p>
           </div>
           <Button asChild className="mt-6">
             <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
@@ -31,7 +31,7 @@ export default function LocationSection() {
         
         <div className="aspect-video w-full rounded-lg overflow-hidden shadow-lg border">
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3675.659862228184!2d-45.476859925816456!3d-22.88902003723419!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjLCsDUzJzIwLjUiUyA0NcKwMjgnMjcuNCJX!5e0!3m2!1spt-BR!2sbr!4v1761130681398!5m2!1spt-BR!2sbr" 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3669.969133465365!2d-45.6920880258097!3d-23.17117104449833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cc5f3b3d4f5c69%3A0x202b3786f4a76da4!2sCh%C3%A1cara%20Sonho%20Verde!5e0!3m2!1spt-BR!2sbr!4v1762118335123!5m2!1spt-BR!2sbr" 
             width="100%" 
             height="100%" 
             style={{border:0}} 
