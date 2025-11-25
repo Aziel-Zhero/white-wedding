@@ -37,6 +37,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setActiveTab("login"); // Ensure loading state is shown on the correct button
 
     try {
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
@@ -55,6 +56,7 @@ export default function LoginPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setActiveTab("register"); // Ensure loading state is shown on the correct button
 
     try {
       await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
@@ -64,8 +66,7 @@ export default function LoginPage() {
         title: "Cadastro realizado com sucesso!",
         description: "Redirecionando para o painel...",
       });
-    } catch (error: any)
-    {
+    } catch (error: any) {
       console.error("Registration error:", error);
       let description = "Ocorreu um erro ao criar a conta.";
       if (error.code === 'auth/email-already-in-use') {
@@ -78,7 +79,7 @@ export default function LoginPage() {
         title: "Erro no cadastro",
         description: description,
       });
-       setIsLoading(false);
+      setIsLoading(false);
     }
     // Não definimos setIsLoading(false) aqui no sucesso,
     // pois o redirecionamento acontecerá em seguida.
