@@ -143,11 +143,11 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
              </Button>
            </div>
         ) : (
-          <ScrollArea className="max-h-[85vh]">
-            <div className="grid md:grid-cols-2 p-1">
-                <div className="hidden md:flex flex-col items-center justify-center p-6 md:p-8 bg-secondary/50 rounded-l-lg">
+          <ScrollArea className="max-h-[90vh]">
+            <div className="grid md:grid-cols-2">
+                <div className="flex flex-col p-6 bg-secondary/50 md:rounded-l-lg">
                     {gift.image && (
-                        <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border">
+                        <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border mx-auto">
                             <Image
                                 src={gift.image.imageUrl}
                                 alt={gift.name}
@@ -163,7 +163,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                     </div>
                 </div>
 
-                <div className="p-6 md:p-8 flex flex-col">
+                <div className="p-6 flex flex-col">
                     <DialogHeader className="text-left">
                         <DialogTitle className="font-headline text-2xl flex items-center gap-2">
                             <Gift className="h-6 w-6 text-primary" /> Presentear
