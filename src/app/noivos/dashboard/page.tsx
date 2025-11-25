@@ -347,8 +347,8 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
       router.push('/login');
+      await signOut(auth);
     } catch (error) {
       console.error("Sign out error:", error);
       toast({
@@ -837,4 +837,5 @@ export default function DashboardPage() {
 
 }
 
+    
     
