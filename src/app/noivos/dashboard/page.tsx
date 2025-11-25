@@ -86,6 +86,13 @@ export default function DashboardPage() {
   const [isSavingGift, setIsSavingGift] = useState(false);
   const [isAddGiftOpen, setIsAddGiftOpen] = useState(false);
 
+  // --- Form State for New Guest ---
+  const [newGuestName, setNewGuestName] = useState("");
+  const [newGuestEmail, setNewGuestEmail] = useState("");
+  const [isSavingGuest, setIsSavingGuest] = useState(false);
+  const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
+
+
   // --- Firebase Data ---
   const guestsRef = useMemoFirebase(() => collection(firestore, "couples", coupleId, "guests"), [firestore]);
   const giftsRef = useMemoFirebase(() => collection(firestore, "couples", coupleId, "gifts"), [firestore]);
@@ -188,6 +195,47 @@ export default function DashboardPage() {
       });
   };
 
+  const handleAddGuest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGuestName) {
+      toast({
+        variant: "destructive",
+        title: "Campo obrigatório",
+        description: "Por favor, preencha o nome do convidado.",
+      });
+      return;
+    }
+    setIsSavingGuest(true);
+
+    const newGuestData = {
+      name: newGuestName,
+      email: newGuestEmail,
+      coupleId: coupleId,
+    };
+
+    addDoc(guestsRef, newGuestData)
+      .then(() => {
+        toast({
+          title: "Convidado Adicionado!",
+          description: `"${newGuestName}" foi adicionado à sua lista de convidados.`,
+        });
+        setNewGuestName("");
+        setNewGuestEmail("");
+        setIsAddGuestOpen(false);
+      })
+      .catch((error) => {
+        const permissionError = new FirestorePermissionError({
+          path: guestsRef.path,
+          operation: 'create',
+          requestResourceData: newGuestData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setIsSavingGuest(false);
+      });
+  };
+
 
   const renderSkeleton = (rows = 5) => (
     Array.from({ length: rows }).map((_, index) => (
@@ -239,7 +287,44 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-headline font-bold flex items-center gap-2">
                 <UserPlus /> Gerenciar Convidados
               </h2>
-              {/* Add Guest Dialog Here */}
+              <Dialog open={isAddGuestOpen} onOpenChange={setIsAddGuestOpen}>
+                <DialogTrigger asChild>
+                  <Button>Adicionar Convidado</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Novo Convidado</DialogTitle>
+                    <DialogDescription>
+                      Insira os detalhes do seu convidado para adicioná-lo à lista.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleAddGuest}>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="guest-name" className="text-right">
+                          Nome
+                        </Label>
+                        <Input id="guest-name" value={newGuestName} onChange={(e) => setNewGuestName(e.target.value)} className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="guest-email" className="text-right">
+                          Email
+                        </Label>
+                        <Input id="guest-email" type="email" placeholder="Opcional" value={newGuestEmail} onChange={(e) => setNewGuestEmail(e.target.value)} className="col-span-3" />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">Cancelar</Button>
+                      </DialogClose>
+                      <Button type="submit" disabled={isSavingGuest}>
+                         {isSavingGuest ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                         {isSavingGuest ? 'Salvando...' : 'Salvar Convidado'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
             <Card>
               <CardContent className="p-0">
@@ -568,9 +653,5 @@ export default function DashboardPage() {
       </Tabs>
     </TooltipProvider>
   );
-
-    
-
-    
 
     
