@@ -18,15 +18,18 @@ export default function SurpriseDialog() {
   const [isRevealed, setIsRevealed] = useState(false);
 
   useEffect(() => {
-    const hasBeenShown = sessionStorage.getItem("surpriseShown");
+    // We only want to run this effect on the client
+    if (typeof window !== 'undefined') {
+      const hasBeenShown = sessionStorage.getItem("surpriseShown");
 
-    if (!hasBeenShown) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        sessionStorage.setItem("surpriseShown", "true");
-      }, 1500);
+      if (!hasBeenShown) {
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+          sessionStorage.setItem("surpriseShown", "true");
+        }, 1500);
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      }
     }
   }, []);
 
@@ -35,6 +38,10 @@ export default function SurpriseDialog() {
     // Reset for next time if they close it before revealing
     setTimeout(() => setIsRevealed(false), 300);
   };
+  
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   return (
     <AlertDialog open={isOpen} onOpenChange={handleClose}>
