@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -11,6 +12,10 @@ service cloud.firestore {
       // Ensure the document exists before trying to access its data
       let coupleDoc = get(/databases/$(database)/documents/couples/$(coupleId));
       return isSignedIn() && coupleDoc.data.ownerId == request.auth.uid;
+    }
+    
+    function isNewGiftOwner() {
+        return request.resource.data.ownerId == request.auth.uid;
     }
 
     // Rules for the 'couples' collection
@@ -27,15 +32,17 @@ service cloud.firestore {
 
       match /gifts/{giftId} {
         allow read: if true;
-        allow create: if isOwner(coupleId); // Explicitly allow create for the owner
+        allow create: if isSignedIn() && isNewGiftOwner();
         allow update: if isOwner(coupleId) || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['contributedAmount']);
         allow delete: if isOwner(coupleId);
       }
       
       match /rsvps/{rsvpId} {
-        allow read: if true; 
+        allow read: if isOwner(coupleId); 
         allow create: if true; // Anyone can RSVP
       }
     }
   }
 }
+
+    

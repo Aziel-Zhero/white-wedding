@@ -22,7 +22,7 @@ import {
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError, useUser } from "@/firebase";
 import { coupleId } from "@/lib/couple-data";
 import {
   Card,
@@ -76,6 +76,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function DashboardPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { user } = useUser();
 
   // --- Form State for New Gift ---
   const [newGiftName, setNewGiftName] = useState("");
@@ -132,6 +133,14 @@ export default function DashboardPage() {
 
   const handleAddGift = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Não autenticado",
+            description: "Você precisa estar logado para adicionar um presente.",
+        });
+        return;
+    }
     if (!newGiftName || !newGiftPrice) {
       toast({
         variant: "destructive",
@@ -149,6 +158,7 @@ export default function DashboardPage() {
       totalPrice: parseFloat(newGiftPrice),
       contributedAmount: 0,
       imageUrl: newGiftImageUrl,
+      ownerId: user.uid, // Adiciona o ID do usuário logado
     };
 
     addDoc(giftsRef, newGiftData)
@@ -558,5 +568,7 @@ export default function DashboardPage() {
       </Tabs>
     </TooltipProvider>
   );
+
+    
 
     
