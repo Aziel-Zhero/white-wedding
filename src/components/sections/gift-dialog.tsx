@@ -155,6 +155,15 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
           <ScrollArea className="max-h-[90vh]">
             <div className="grid md:grid-cols-2">
                 <div className="relative flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                    <DialogHeader className="text-left mb-4">
+                      <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                        <Gift className="h-6 w-6" /> Presentear
+                      </DialogTitle>
+                      <DialogDescription>
+                        Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar.
+                      </DialogDescription>
+                    </DialogHeader>
+
                     {gift.image && (
                         <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
                             <Image
@@ -164,14 +173,6 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                 className="object-cover"
                                 data-ai-hint={gift.image.imageHint}
                             />
-                            <div className="absolute top-0 left-0 bg-black/50 text-white p-4 rounded-br-lg">
-                                <DialogTitle className="font-headline text-2xl flex items-center gap-2">
-                                    <Gift className="h-6 w-6" /> Presentear
-                                </DialogTitle>
-                                <DialogDescription className="text-white/90">
-                                    Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar.
-                                </DialogDescription>
-                            </div>
                         </div>
                     )}
                     <div className="mt-4 text-center">
@@ -250,17 +251,19 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Comprovante (Opcional)</FormLabel>
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => proofInputRef.current?.click()}
-                                        >
-                                            <Upload className="mr-2 h-4 w-4" />
-                                            Escolher arquivo
-                                        </Button>
-                                        {fileName && <span className="text-sm text-muted-foreground truncate">{fileName}</span>}
-                                    </div>
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => proofInputRef.current?.click()}
+                                            >
+                                                <Upload className="mr-2 h-4 w-4" />
+                                                Escolher arquivo
+                                            </Button>
+                                            {fileName && <span className="text-sm text-muted-foreground truncate">{fileName}</span>}
+                                        </div>
+                                    </FormControl>
                                      <Input
                                         type="file"
                                         className="hidden"
