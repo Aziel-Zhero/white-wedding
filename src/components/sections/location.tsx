@@ -3,8 +3,8 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 
 export default function LocationSection() {
-  const address = "Chácara Sonho Verde, Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena, Caçapava - SP";
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  const address = "Chácara Recanto Sonho Meu, Estrada Municipal Romeu de Campos, Pindamonhangaba - SP";
+  const googleMapsUrl = `https://maps.app.goo.gl/w8Kg7Vd51T4KcbWg6`;
 
   return (
     <section id="local" className="py-20 lg:py-32">
@@ -18,8 +18,8 @@ export default function LocationSection() {
             A cerimônia e a recepção acontecerão no mesmo local para sua comodidade.
           </p>
           <div className="mt-6 text-lg">
-            <p className="font-semibold">Chácara Sonho Verde</p>
-            <p className="text-muted-foreground">Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena, Caçapava - SP</p>
+            <p className="font-semibold">Chácara Recanto Sonho Meu</p>
+            <p className="text-muted-foreground">Estrada Municipal Romeu de Campos, Pindamonhangaba - SP</p>
           </div>
           <Button asChild className="mt-6">
             <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
@@ -31,7 +31,7 @@ export default function LocationSection() {
         
         <div className="aspect-video w-full rounded-lg overflow-hidden shadow-lg border">
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3669.969133465365!2d-45.6920880258097!3d-23.17117104449833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cc5f3b3d4f5c69%3A0x202b3786f4a76da4!2sCh%C3%A1cara%20Sonho%20Verde!5e0!3m2!1spt-BR!2sbr!4v1762118335123!5m2!1spt-BR!2sbr" 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.564177579626!2d-45.42236118898159!3d-23.11306387899757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cc6033bd2f8015%3A0x6b349b1686235b8e!2sCh%C3%A1cara%20Recanto%20Sonho%20Meu!5e0!3m2!1spt-BR!2sbr!4v1762119015197!5m2!1spt-BR!2sbr" 
             width="100%" 
             height="100%" 
             style={{border:0}} 
