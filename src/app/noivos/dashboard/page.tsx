@@ -12,6 +12,7 @@ import {
   MoreHorizontal,
   Loader2,
   Trash2,
+  Edit,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -70,12 +71,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
@@ -88,24 +87,33 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
 
+type GuestType = {
+  id: string;
+  name: string;
+  email?: string;
+};
+
 export default function DashboardPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const { user } = useUser();
 
-  // --- Form State for New Gift ---
-  const [newGiftName, setNewGiftName] = useState("");
-  const [newGiftDescription, setNewGiftDescription] = useState("");
-  const [newGiftPrice, setNewGiftPrice] = useState("");
-  const [newGiftImageUrl, setNewGiftImageUrl] = useState("");
+  // --- Form State for New/Edit Gift ---
+  const [isGiftDialogOpen, setIsGiftDialogOpen] = useState(false);
   const [isSavingGift, setIsSavingGift] = useState(false);
-  const [isAddGiftOpen, setIsAddGiftOpen] = useState(false);
+  const [editingGift, setEditingGift] = useState<GiftType | null>(null);
+  const [giftName, setGiftName] = useState("");
+  const [giftDescription, setGiftDescription] = useState("");
+  const [giftPrice, setGiftPrice] = useState("");
+  const [giftImageUrl, setGiftImageUrl] = useState("");
 
-  // --- Form State for New Guest ---
-  const [newGuestName, setNewGuestName] = useState("");
-  const [newGuestEmail, setNewGuestEmail] = useState("");
+
+  // --- Form State for New/Edit Guest ---
+  const [isGuestDialogOpen, setIsGuestDialogOpen] = useState(false);
   const [isSavingGuest, setIsSavingGuest] = useState(false);
-  const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
+  const [editingGuest, setEditingGuest] = useState<GuestType | null>(null);
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
 
 
   // --- Firebase Data ---
@@ -113,7 +121,7 @@ export default function DashboardPage() {
   const giftsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "gifts") : null, [firestore]);
   const rsvpsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "rsvps") : null, [firestore]);
 
-  const { data: allGuests, isLoading: isLoadingGuests } = useCollection(guestsRef);
+  const { data: allGuests, isLoading: isLoadingGuests } = useCollection<GuestType>(guestsRef);
   const { data: gifts, isLoading: isLoadingGifts } = useCollection<GiftType>(giftsRef);
   const { data: rsvps, isLoading: isLoadingRsvps } = useCollection(rsvpsRef);
   
@@ -173,103 +181,58 @@ export default function DashboardPage() {
       })) ?? [];
   }, [gifts]);
 
-  const handleAddGift = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !giftsRef) {
-        toast({
-            variant: "destructive",
-            title: "Não autenticado",
-            description: "Você precisa estar logado para adicionar um presente.",
-        });
-        return;
-    }
-    if (!newGiftName || !newGiftPrice) {
-      toast({
-        variant: "destructive",
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha o nome e o preço do presente.",
-      });
-      return;
-    }
 
-    setIsSavingGift(true);
-
-    const newGiftData = {
-      name: newGiftName,
-      description: newGiftDescription,
-      totalPrice: parseFloat(newGiftPrice),
-      contributedAmount: 0,
-      imageUrl: newGiftImageUrl,
-      ownerId: user.uid,
-    };
-
-    addDoc(giftsRef, newGiftData)
-      .then(() => {
-        toast({
-          title: "Presente adicionado!",
-          description: `"${newGiftName}" foi adicionado à sua lista.`,
-        });
-        
-        setNewGiftName("");
-        setNewGiftDescription("");
-        setNewGiftPrice("");
-        setNewGiftImageUrl("");
-        setIsAddGiftOpen(false);
-      })
-      .catch((error) => {
-        const permissionError = new FirestorePermissionError({
-          path: giftsRef.path,
-          operation: 'create',
-          requestResourceData: newGiftData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => {
-        setIsSavingGift(false);
-      });
+  // --- Guest Management ---
+  const openAddGuestDialog = () => {
+    setEditingGuest(null);
+    setGuestName("");
+    setGuestEmail("");
+    setIsGuestDialogOpen(true);
   };
 
-  const handleAddGuest = async (e: React.FormEvent) => {
+  const openEditGuestDialog = (guest: GuestType) => {
+    setEditingGuest(guest);
+    setGuestName(guest.name);
+    setGuestEmail(guest.email || "");
+    setIsGuestDialogOpen(true);
+  };
+
+  const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!guestsRef) return;
-    if (!newGuestName) {
-      toast({
-        variant: "destructive",
-        title: "Campo obrigatório",
-        description: "Por favor, preencha o nome do convidado.",
-      });
-      return;
+    if (!user || !guestsRef) return;
+    if (!guestName) {
+        toast({ variant: "destructive", title: "Campo obrigatório", description: "Por favor, preencha o nome do convidado." });
+        return;
     }
     setIsSavingGuest(true);
 
-    const newGuestData = {
-      name: newGuestName,
-      email: newGuestEmail,
-      coupleId: coupleId,
-    };
-
-    addDoc(guestsRef, newGuestData)
-      .then(() => {
-        toast({
-          title: "Convidado Adicionado!",
-          description: `"${newGuestName}" foi adicionado à sua lista de convidados.`,
-        });
-        setNewGuestName("");
-        setNewGuestEmail("");
-        setIsAddGuestOpen(false);
-      })
-      .catch((error) => {
-        const permissionError = new FirestorePermissionError({
-          path: guestsRef.path,
-          operation: 'create',
-          requestResourceData: newGuestData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      })
-      .finally(() => {
-        setIsSavingGuest(false);
-      });
-  };
+    if (editingGuest) { // Update existing guest
+        const guestDocRef = doc(firestore, "couples", coupleId, "guests", editingGuest.id);
+        const updatedData = { name: guestName, email: guestEmail };
+        updateDoc(guestDocRef, updatedData)
+            .then(() => {
+                toast({ title: "Convidado Atualizado!", description: `"${guestName}" foi atualizado com sucesso.` });
+                setIsGuestDialogOpen(false);
+            })
+            .catch(() => {
+                const permissionError = new FirestorePermissionError({ path: guestDocRef.path, operation: 'update', requestResourceData: updatedData });
+                errorEmitter.emit('permission-error', permissionError);
+            })
+            .finally(() => setIsSavingGuest(false));
+    } else { // Add new guest
+        const newGuestData = { name: guestName, email: guestEmail, coupleId: coupleId };
+        addDoc(guestsRef, newGuestData)
+            .then(() => {
+                toast({ title: "Convidado Adicionado!", description: `"${guestName}" foi adicionado à sua lista.` });
+                setIsGuestDialogOpen(false);
+            })
+            .catch(() => {
+                const permissionError = new FirestorePermissionError({ path: guestsRef.path, operation: 'create', requestResourceData: newGuestData });
+                errorEmitter.emit('permission-error', permissionError);
+            })
+            .finally(() => setIsSavingGuest(false));
+    }
+};
 
   const handleDeleteGuest = async (guestId: string, guestName: string) => {
     if (!firestore) return;
@@ -288,6 +251,72 @@ export default function DashboardPage() {
         });
         errorEmitter.emit('permission-error', permissionError);
       });
+  };
+
+  // --- Gift Management ---
+  const openAddGiftDialog = () => {
+    setEditingGift(null);
+    setGiftName("");
+    setGiftDescription("");
+    setGiftPrice("");
+    setGiftImageUrl("");
+    setIsGiftDialogOpen(true);
+  };
+
+  const openEditGiftDialog = (gift: GiftType) => {
+    setEditingGift(gift);
+    setGiftName(gift.name);
+    setGiftDescription(gift.description || "");
+    setGiftPrice(gift.totalPrice.toString());
+    setGiftImageUrl(gift.imageUrl || "");
+    setIsGiftDialogOpen(true);
+  };
+
+  const handleGiftSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !giftsRef) return;
+    if (!giftName || !giftPrice) {
+        toast({ variant: "destructive", title: "Campos obrigatórios", description: "Por favor, preencha o nome e o preço do presente." });
+        return;
+    }
+    setIsSavingGift(true);
+
+    const giftData = {
+        name: giftName,
+        description: giftDescription,
+        totalPrice: parseFloat(giftPrice),
+        imageUrl: giftImageUrl,
+        ownerId: user.uid, // Required for create rule
+    };
+
+    if (editingGift) { // Update existing gift
+        const giftDocRef = doc(firestore, "couples", coupleId, "gifts", editingGift.id);
+        // contributedAmount is not editable here, so we don't include it.
+        const updateData = { ...giftData, contributedAmount: editingGift.contributedAmount };
+        
+        updateDoc(giftDocRef, updateData)
+            .then(() => {
+                toast({ title: "Presente Atualizado!", description: `"${giftName}" foi atualizado com sucesso.` });
+                setIsGiftDialogOpen(false);
+            })
+            .catch(() => {
+                const permissionError = new FirestorePermissionError({ path: giftDocRef.path, operation: 'update', requestResourceData: updateData });
+                errorEmitter.emit('permission-error', permissionError);
+            })
+            .finally(() => setIsSavingGift(false));
+    } else { // Add new gift
+        const newGiftData = { ...giftData, contributedAmount: 0 };
+        addDoc(giftsRef, newGiftData)
+            .then(() => {
+                toast({ title: "Presente Adicionado!", description: `"${giftName}" foi adicionado à sua lista.` });
+                setIsGiftDialogOpen(false);
+            })
+            .catch(() => {
+                const permissionError = new FirestorePermissionError({ path: giftsRef.path, operation: 'create', requestResourceData: newGiftData });
+                errorEmitter.emit('permission-error', permissionError);
+            })
+            .finally(() => setIsSavingGift(false));
+    }
   };
 
   const handleDeleteGift = async (giftId: string, giftName: string) => {
@@ -359,30 +388,30 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-headline font-bold flex items-center gap-2">
                 <UserPlus /> Gerenciar Convidados
               </h2>
-              <Dialog open={isAddGuestOpen} onOpenChange={setIsAddGuestOpen}>
+              <Dialog open={isGuestDialogOpen} onOpenChange={setIsGuestDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button>Adicionar Convidado</Button>
+                  <Button onClick={openAddGuestDialog}>Adicionar Convidado</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
-                    <DialogTitle>Adicionar Novo Convidado</DialogTitle>
+                    <DialogTitle>{editingGuest ? 'Editar Convidado' : 'Adicionar Novo Convidado'}</DialogTitle>
                     <DialogDescription>
-                      Insira os detalhes do seu convidado para adicioná-lo à lista.
+                      {editingGuest ? 'Altere os detalhes do seu convidado.' : 'Insira os detalhes do seu convidado para adicioná-lo à lista.'}
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleAddGuest}>
+                  <form onSubmit={handleGuestSubmit}>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="guest-name" className="text-right">
                           Nome
                         </Label>
-                        <Input id="guest-name" value={newGuestName} onChange={(e) => setNewGuestName(e.target.value)} className="col-span-3" required />
+                        <Input id="guest-name" value={guestName} onChange={(e) => setGuestName(e.target.value)} className="col-span-3" required />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="guest-email" className="text-right">
                           Email
                         </Label>
-                        <Input id="guest-email" type="email" placeholder="Opcional" value={newGuestEmail} onChange={(e) => setNewGuestEmail(e.target.value)} className="col-span-3" />
+                        <Input id="guest-email" type="email" placeholder="Opcional" value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} className="col-span-3" />
                       </div>
                     </div>
                     <DialogFooter>
@@ -391,7 +420,7 @@ export default function DashboardPage() {
                       </DialogClose>
                       <Button type="submit" disabled={isSavingGuest}>
                          {isSavingGuest ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                         {isSavingGuest ? 'Salvando...' : 'Salvar Convidado'}
+                         {isSavingGuest ? 'Salvando...' : 'Salvar'}
                       </Button>
                     </DialogFooter>
                   </form>
@@ -433,7 +462,10 @@ export default function DashboardPage() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem disabled>Editar</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => openEditGuestDialog(guest)}>
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Editar
+                                    </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
@@ -613,42 +645,42 @@ export default function DashboardPage() {
                   <h2 className="text-xl font-headline font-bold flex items-center gap-2">
                     <ListPlus /> Itens da sua Lista
                   </h2>
-                   <Dialog open={isAddGiftOpen} onOpenChange={setIsAddGiftOpen}>
+                   <Dialog open={isGiftDialogOpen} onOpenChange={setIsGiftDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button>Adicionar Presente</Button>
+                      <Button onClick={openAddGiftDialog}>Adicionar Presente</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[480px]">
                       <DialogHeader>
-                        <DialogTitle>Adicionar Novo Presente</DialogTitle>
+                        <DialogTitle>{editingGift ? 'Editar Presente' : 'Adicionar Novo Presente'}</DialogTitle>
                         <DialogDescription>
-                          Preencha os detalhes do novo item para a sua lista de presentes.
+                          {editingGift ? 'Altere os detalhes do item da sua lista.' : 'Preencha os detalhes do novo item para a sua lista de presentes.'}
                         </DialogDescription>
                       </DialogHeader>
-                      <form onSubmit={handleAddGift}>
+                      <form onSubmit={handleGiftSubmit}>
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="gift-name" className="text-right">
                               Nome
                             </Label>
-                            <Input id="gift-name" value={newGiftName} onChange={(e) => setNewGiftName(e.target.value)} className="col-span-3" required />
+                            <Input id="gift-name" value={giftName} onChange={(e) => setGiftName(e.target.value)} className="col-span-3" required />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="gift-description" className="text-right">
                               Descrição
                             </Label>
-                            <Textarea id="gift-description" value={newGiftDescription} onChange={(e) => setNewGiftDescription(e.target.value)} className="col-span-3" />
+                            <Textarea id="gift-description" value={giftDescription} onChange={(e) => setGiftDescription(e.target.value)} className="col-span-3" />
                           </div>
                            <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="gift-price" className="text-right">
                               Preço (R$)
                             </Label>
-                            <Input id="gift-price" type="number" step="0.01" value={newGiftPrice} onChange={(e) => setNewGiftPrice(e.target.value)} className="col-span-3" required />
+                            <Input id="gift-price" type="number" step="0.01" value={giftPrice} onChange={(e) => setGiftPrice(e.target.value)} className="col-span-3" required />
                           </div>
                            <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="gift-image" className="text-right">
                               URL da Imagem
                             </Label>
-                            <Input id="gift-image" placeholder="Opcional" value={newGiftImageUrl} onChange={(e) => setNewGiftImageUrl(e.target.value)} className="col-span-3" />
+                            <Input id="gift-image" placeholder="Opcional" value={giftImageUrl} onChange={(e) => setGiftImageUrl(e.target.value)} className="col-span-3" />
                           </div>
                         </div>
                         <DialogFooter>
@@ -657,7 +689,7 @@ export default function DashboardPage() {
                           </DialogClose>
                           <Button type="submit" disabled={isSavingGift}>
                             {isSavingGift ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            {isSavingGift ? 'Salvando...' : 'Salvar Presente'}
+                            {isSavingGift ? 'Salvando...' : 'Salvar'}
                           </Button>
                         </DialogFooter>
                       </form>
@@ -732,7 +764,10 @@ export default function DashboardPage() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem disabled>Editar</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => openEditGiftDialog(gift)}>
+                                       <Edit className="mr-2 h-4 w-4" />
+                                       Editar
+                                    </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
