@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from '@/lib/utils';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
   title: 'Eduarda & Aziel - 16 de Maio de 2026',
@@ -24,7 +25,9 @@ export default function RootLayout({
         // This is a workaround for a bug in Next.js where the body font is not applied correctly.
         "font-sans"
         )}>
-        {children}
+        <FirebaseClientProvider>
+          {children}
+        </FirebaseClientProvider>
         <Toaster />
       </body>
     </html>
