@@ -1,6 +1,11 @@
-import { MapPin } from "lucide-react";
+import { Map, MapPin } from "lucide-react";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 export default function LocationSection() {
+  const address = "Chácara Sonho Verde, Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena";
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+
   return (
     <section id="local" className="py-20 lg:py-32">
       <div className="container mx-auto px-4">
@@ -16,6 +21,12 @@ export default function LocationSection() {
             <p className="font-semibold">Chácara Sonho Verde</p>
             <p className="text-muted-foreground">Estrada Municipal Jorge Emilio Vieira, S/N - Cruz Pequena</p>
           </div>
+          <Button asChild className="mt-6">
+            <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+              <Map className="mr-2 h-4 w-4" />
+              Ver no mapa
+            </Link>
+          </Button>
         </div>
         
         <div className="aspect-video w-full rounded-lg overflow-hidden shadow-lg border">
