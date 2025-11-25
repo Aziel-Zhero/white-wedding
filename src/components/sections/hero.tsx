@@ -14,7 +14,7 @@ export default function HeroSection() {
     startDate: "20260516T183000Z", // 15:30 in São Paulo (UTC-3)
     endDate: "20260517T013000Z",   // 22:30 in São Paulo (UTC-3)
     details: "Estamos nos casando! Junte-se a nós para celebrar nosso amor. Mais detalhes em nosso site.",
-    location: "Chácara Recanto Verde, Estr. Mun. Jorge Emílio Vieira, Pindamonhangaba - SP"
+    location: "Chácara Recanto Verde, Estr. Mun. Jorge Emílio Vieira, S/N - Pindamonhangaba, SP"
   };
 
   const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.startDate}/${event.endDate}&details=${encodeURIComponent(event.details)}&location=${encodeURIComponent(event.location)}`;

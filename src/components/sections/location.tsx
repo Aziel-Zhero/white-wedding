@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 
 export default function LocationSection() {
-  const address = "Estr. Mun. Jorge Emílio Vieira - Pindamonhangaba, SP";
+  const address = "Estr. Mun. Jorge Emílio Vieira, S/N - Pindamonhangaba, SP";
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=Chacara+Recanto+Verde,Estrada+Municipal+Jorge+Emilio+Vieira,Pindamonhangaba`;
 
   return (

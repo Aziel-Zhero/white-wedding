@@ -28,7 +28,7 @@ export default function DetailsSection() {
               <p>às 15:30 horas</p>
               <Separator className="my-4" />
               <p className="font-semibold">Chácara Recanto Verde</p>
-              <p>Estr. Mun. Jorge Emílio Vieira - Pindamonhangaba, SP</p>
+              <p>Estr. Mun. Jorge Emílio Vieira, S/N - Pindamonhangaba, SP</p>
             </CardContent>
           </Card>
 
@@ -44,7 +44,7 @@ export default function DetailsSection() {
               <p>após a cerimônia</p>
               <Separator className="my-4" />
               <p className="font-semibold">Chácara Recanto Verde</p>
-              <p>Estr. Mun. Jorge Emílio Vieira - Pindamonhangaba, SP</p>
+              <p>Estr. Mun. Jorge Emílio Vieira, S/N - Pindamonhangaba, SP</p>
             </CardContent>
           </Card>
         </div>
