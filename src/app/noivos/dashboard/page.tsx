@@ -10,7 +10,8 @@ import {
   UserPlus,
   ListPlus,
   MoreHorizontal,
-  Loader2
+  Loader2,
+  Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,6 +49,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -59,6 +61,17 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -96,9 +109,9 @@ export default function DashboardPage() {
 
 
   // --- Firebase Data ---
-  const guestsRef = useMemoFirebase(() => collection(firestore, "couples", coupleId, "guests"), [firestore]);
-  const giftsRef = useMemoFirebase(() => collection(firestore, "couples", coupleId, "gifts"), [firestore]);
-  const rsvpsRef = useMemoFirebase(() => collection(firestore, "couples", coupleId, "rsvps"), [firestore]);
+  const guestsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "guests") : null, [firestore]);
+  const giftsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "gifts") : null, [firestore]);
+  const rsvpsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "rsvps") : null, [firestore]);
 
   const { data: allGuests, isLoading: isLoadingGuests } = useCollection(guestsRef);
   const { data: gifts, isLoading: isLoadingGifts } = useCollection<GiftType>(giftsRef);
@@ -111,7 +124,6 @@ export default function DashboardPage() {
       const ensureCoupleDoc = async () => {
         const docSnap = await getDoc(coupleDocRef);
         if (!docSnap.exists()) {
-          // Document doesn't exist, create it with the ownerId
           try {
             await setDoc(coupleDocRef, { ownerId: user.uid }, { merge: true });
           } catch (error) {
@@ -139,10 +151,9 @@ export default function DashboardPage() {
 
   const giftsWithContributors = useMemo(() => {
     if (!gifts) return [];
-    // This logic can be expanded if we store contributors in a subcollection
     return gifts.map(gift => ({
         ...gift,
-        contributors: [], // Placeholder for now
+        contributors: [], 
         image: PlaceHolderImages.find(p => p.id === gift.id) || (gift.imageUrl ? { id: gift.id, imageUrl: gift.imageUrl, description: gift.name, imageHint: '' } : undefined)
     }));
   }, [gifts]);
@@ -151,7 +162,6 @@ export default function DashboardPage() {
     return gifts?.reduce((acc, gift) => acc + (gift.contributedAmount || 0), 0) ?? 0;
   }, [gifts]);
   
-  // A placeholder for received gifts, as we are not yet storing individual contributions.
   const receivedGifts = useMemo(() => {
     return gifts
       ?.filter(g => g.contributedAmount > 0)
@@ -159,13 +169,13 @@ export default function DashboardPage() {
         id: g.id,
         name: g.name,
         amount: g.contributedAmount,
-        from: 'Contribuições' // This would need a subcollection to be accurate
+        from: 'Contribuições'
       })) ?? [];
   }, [gifts]);
 
   const handleAddGift = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
+    if (!user || !giftsRef) {
         toast({
             variant: "destructive",
             title: "Não autenticado",
@@ -190,7 +200,7 @@ export default function DashboardPage() {
       totalPrice: parseFloat(newGiftPrice),
       contributedAmount: 0,
       imageUrl: newGiftImageUrl,
-      ownerId: user.uid, // Adiciona o ID do usuário logado
+      ownerId: user.uid,
     };
 
     addDoc(giftsRef, newGiftData)
@@ -200,7 +210,6 @@ export default function DashboardPage() {
           description: `"${newGiftName}" foi adicionado à sua lista.`,
         });
         
-        // Reset form and close dialog
         setNewGiftName("");
         setNewGiftDescription("");
         setNewGiftPrice("");
@@ -222,6 +231,7 @@ export default function DashboardPage() {
 
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!guestsRef) return;
     if (!newGuestName) {
       toast({
         variant: "destructive",
@@ -261,6 +271,43 @@ export default function DashboardPage() {
       });
   };
 
+  const handleDeleteGuest = async (guestId: string, guestName: string) => {
+    if (!firestore) return;
+    const guestDocRef = doc(firestore, "couples", coupleId, "guests", guestId);
+    deleteDoc(guestDocRef)
+      .then(() => {
+        toast({
+          title: "Convidado Removido",
+          description: `"${guestName}" foi removido da sua lista.`,
+        });
+      })
+      .catch((error) => {
+        const permissionError = new FirestorePermissionError({
+          path: guestDocRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+  };
+
+  const handleDeleteGift = async (giftId: string, giftName: string) => {
+    if (!firestore) return;
+    const giftDocRef = doc(firestore, "couples", coupleId, "gifts", giftId);
+    deleteDoc(giftDocRef)
+      .then(() => {
+        toast({
+          title: "Presente Removido",
+          description: `"${giftName}" foi removido da sua lista.`,
+        });
+      })
+      .catch((error) => {
+        const permissionError = new FirestorePermissionError({
+          path: giftDocRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+  };
 
   const renderSkeleton = (rows = 5) => (
     Array.from({ length: rows }).map((_, index) => (
@@ -386,8 +433,36 @@ export default function DashboardPage() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">Remover</DropdownMenuItem>
+                                    <DropdownMenuItem disabled>Editar</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem
+                                          className="text-destructive"
+                                          onSelect={(e) => e.preventDefault()}
+                                        >
+                                          <Trash2 className="mr-2 h-4 w-4" />
+                                          Remover
+                                        </DropdownMenuItem>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Essa ação não pode ser desfeita. Isso removerá permanentemente o convidado <strong>{guest.name}</strong> da sua lista.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            className="bg-destructive hover:bg-destructive/90"
+                                            onClick={() => handleDeleteGuest(guest.id, guest.name)}
+                                          >
+                                            Sim, remover
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </TableCell>
@@ -496,7 +571,6 @@ export default function DashboardPage() {
                     )}
                   </CardContent>
                 </Card>
-
 
                 <Card>
                   <CardHeader>
@@ -658,8 +732,36 @@ export default function DashboardPage() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem>Editar</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">Remover</DropdownMenuItem>
+                                    <DropdownMenuItem disabled>Editar</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem
+                                          className="text-destructive"
+                                          onSelect={(e) => e.preventDefault()}
+                                        >
+                                          <Trash2 className="mr-2 h-4 w-4" />
+                                          Remover
+                                        </DropdownMenuItem>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Essa ação não pode ser desfeita. Isso removerá permanentemente o presente <strong>{gift.name}</strong> da sua lista.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            className="bg-destructive hover:bg-destructive/90"
+                                            onClick={() => handleDeleteGift(gift.id, gift.name)}
+                                          >
+                                            Sim, remover
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </TableCell>
@@ -679,6 +781,6 @@ export default function DashboardPage() {
     </TooltipProvider>
   );
 
-    
+}
 
     
