@@ -156,7 +156,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
             <div className="grid md:grid-cols-2">
                 <div className="flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
                     {gift.image && (
-                        <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border-4 border-primary/10 mx-auto shadow-md">
+                        <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
                             <Image
                                 src={gift.image.imageUrl}
                                 alt={gift.name}
@@ -252,22 +252,22 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                             <Upload className="mr-2 h-4 w-4" />
                                             {fileName ? <span className="truncate">{fileName}</span> : "Escolher arquivo"}
                                         </Button>
-                                        <Input
-                                            type="file"
-                                            className="hidden"
-                                            {...proofRest}
-                                            ref={(e) => {
-                                                proofRef(e);
-                                                // @ts-ignore
-                                                proofInputRef.current = e;
-                                            }}
-                                            onChange={(event) => {
-                                                const file = event.target.files?.[0];
-                                                setFileName(file ? file.name : null);
-                                                field.onChange(file ? event.target.files : null);
-                                            }}
-                                        />
                                     </FormControl>
+                                     <Input
+                                        type="file"
+                                        className="hidden"
+                                        {...proofRest}
+                                        ref={(e) => {
+                                            proofRef(e);
+                                            // @ts-ignore
+                                            proofInputRef.current = e;
+                                        }}
+                                        onChange={(event) => {
+                                            const file = event.target.files?.[0];
+                                            setFileName(file ? file.name : null);
+                                            field.onChange(file ? event.target.files : null);
+                                        }}
+                                    />
                                     <FormDescription>
                                         Anexe o comprovante do PIX (print ou PDF).
                                     </FormDescription>
@@ -291,5 +291,3 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
     </Dialog>
   );
 }
-
-    
