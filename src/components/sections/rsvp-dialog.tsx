@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const rsvpFormSchema = z.object({
   name: z.string({
@@ -83,7 +84,7 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="w-[90%] max-w-md rounded-lg">
+      <DialogContent className="w-[90%] max-w-md rounded-lg p-0">
         {isConfirmed ? (
            <div className="text-center p-8">
              <PartyPopper className="h-16 w-16 mx-auto text-primary" />
@@ -98,51 +99,53 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
              </Button>
            </div>
         ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle className="font-headline text-2xl">
-                Confirmar Presença
-              </DialogTitle>
-              <DialogDescription>
-                Ficaremos felizes com a sua presença! Por favor, confirme até 16
-                de Abril de 2026.
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Seu nome</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione seu nome da lista" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {guestList.map((guest) => (
-                            <SelectItem key={guest} value={guest}>
-                              {guest}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button type="submit" size="lg">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Confirmar
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </>
+          <ScrollArea className="max-h-[80vh] sm:max-h-auto">
+            <div className="p-6">
+              <DialogHeader>
+                <DialogTitle className="font-headline text-2xl">
+                  Confirmar Presença
+                </DialogTitle>
+                <DialogDescription>
+                  Ficaremos felizes com a sua presença! Por favor, confirme até 16
+                  de Abril de 2026.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Seu nome</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione seu nome da lista" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {guestList.map((guest) => (
+                              <SelectItem key={guest} value={guest}>
+                                {guest}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button type="submit" size="lg">
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Confirmar
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </div>
+          </ScrollArea>
         )}
       </DialogContent>
     </Dialog>
