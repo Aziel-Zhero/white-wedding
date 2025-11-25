@@ -44,6 +44,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AllGifts } from "@/lib/gifts-data";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 // Mock Data
 const allGuests = [
@@ -60,18 +67,36 @@ const pendingGuests = allGuests.filter(g => g.status === 'Pendente');
 const receivedGifts = [
   {
     id: 1,
+    giftId: "gift-paris-dinner",
     name: "Jantar Romântico em Paris",
-    amount: 500,
+    amount: 50,
     from: "Thaina e Jeferson",
   },
-  { id: 2, name: "Jogo de Panelas Premium", amount: 250, from: "Gustavo" },
-  { id: 3, name: "Kit de Ferramentas", amount: 100, from: "Anônimo" },
+  {
+    id: 4,
+    giftId: "gift-paris-dinner",
+    name: "Jantar Romântico em Paris",
+    amount: 100,
+    from: "Anônimo",
+  },
+  { id: 2, giftId: "gifts-cookware", name: "Jogo de Panelas Premium", amount: 250, from: "Gustavo" },
+  { id: 3, giftId: "gift-tool-kit", name: "Kit de Ferramentas", amount: 100, from: "Anônimo" },
 ];
+
+const giftsWithContributors = AllGifts.map(gift => {
+  const contributors = receivedGifts.filter(g => g.giftId === gift.id);
+  return {
+    ...gift,
+    contributors,
+  };
+});
+
 
 const totalGiftValue = receivedGifts.reduce((acc, gift) => acc + gift.amount, 0);
 
 export default function DashboardPage() {
   return (
+    <TooltipProvider>
     <Tabs defaultValue="convidados" className="flex min-h-screen w-full flex-col bg-muted/40">
       <header className="sticky top-0 z-30 flex h-auto flex-col items-start gap-4 border-b bg-background px-4 py-4 sm:px-6">
         <div className="flex w-full items-center justify-between gap-4">
@@ -82,25 +107,26 @@ export default function DashboardPage() {
           <Button variant="outline" size="sm" asChild>
             <Link href="/">
               <LogOut className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Sair e voltar ao site</span>
-              <span className="inline sm:hidden">Sair</span>
+              Sair
             </Link>
           </Button>
         </div>
-        <TabsList className="grid w-full grid-cols-2 h-auto sm:grid-cols-3 sm:max-w-2xl">
-          <TabsTrigger value="convidados" className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            <span>Convidados</span>
-          </TabsTrigger>
-          <TabsTrigger value="presenca" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            <span>Lista de Presença</span>
-          </TabsTrigger>
-          <TabsTrigger value="presentes" className="flex items-center gap-2">
-            <Gift className="h-4 w-4" />
-            <span>Presentes</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="grid w-full grid-cols-3 h-auto sm:max-w-2xl">
+            <TabsTrigger value="convidados" className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4" />
+              <span>Convidados</span>
+            </TabsTrigger>
+            <TabsTrigger value="presenca" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>Lista de Presença</span>
+            </TabsTrigger>
+            <TabsTrigger value="presentes" className="flex items-center gap-2">
+              <Gift className="h-4 w-4" />
+              <span>Presentes</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
           <TabsContent value="convidados" className="mt-0">
@@ -142,7 +168,7 @@ export default function DashboardPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Nome</TableHead>
-                          <TableHead>Email</TableHead>
+                          <TableHead className="hidden sm:table-cell">Email</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
@@ -153,11 +179,11 @@ export default function DashboardPage() {
                             <TableCell className="font-medium">
                               {guest.name}
                             </TableCell>
-                             <TableCell className="text-muted-foreground">
+                             <TableCell className="hidden sm:table-cell text-muted-foreground">
                               {guest.email}
                             </TableCell>
                             <TableCell>
-                              <Badge variant={guest.status === 'Confirmado' ? 'default' : 'secondary'} className={guest.status === 'Confirmado' ? 'bg-green-600 hover:bg-green-700' : ''}>{guest.status}</Badge>
+                              <Badge variant={guest.status === 'Confirmado' ? 'default' : 'secondary'} className={guest.status === 'Confirmado' ? 'bg-green-600 hover:bg-green-700 text-white' : ''}>{guest.status}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>
@@ -209,7 +235,7 @@ export default function DashboardPage() {
                               {guest.name}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Badge className="bg-green-600 hover:bg-green-700">Confirmado</Badge>
+                              <Badge className="bg-green-600 hover:bg-green-700 text-white">Confirmado</Badge>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -373,12 +399,12 @@ export default function DashboardPage() {
                               <TableHead className="w-[80px] hidden sm:table-cell">Imagem</TableHead>
                               <TableHead>Produto</TableHead>
                               <TableHead>Preço</TableHead>
-                              <TableHead>Arrecadado</TableHead>
+                              <TableHead>Vaquinha</TableHead>
                               <TableHead className="text-right">Ações</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {AllGifts.map((gift) => (
+                            {giftsWithContributors.map((gift) => (
                               <TableRow key={gift.id}>
                                 <TableCell className="hidden sm:table-cell">
                                   {gift.image && (
@@ -401,10 +427,28 @@ export default function DashboardPage() {
                                   })}
                                 </TableCell>
                                 <TableCell>
-                                  {gift.contributedAmount.toLocaleString("pt-BR", {
-                                    style: "currency",
-                                    currency: "BRL",
-                                  })}
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="underline decoration-dotted cursor-pointer">
+                                          {gift.contributedAmount.toLocaleString("pt-BR", {
+                                            style: "currency",
+                                            currency: "BRL",
+                                          })}
+                                      </span>
+                                    </TooltipTrigger>
+                                     {gift.contributors.length > 0 && (
+                                        <TooltipContent>
+                                          <p className="font-bold mb-1">Contribuições:</p>
+                                          <ul className="list-disc pl-4">
+                                            {gift.contributors.map(c => (
+                                              <li key={c.id} className="text-sm">
+                                                {c.from}: {c.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </TooltipContent>
+                                      )}
+                                  </Tooltip>
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <DropdownMenu>
@@ -432,5 +476,6 @@ export default function DashboardPage() {
           
       </main>
     </Tabs>
+    </TooltipProvider>
   );
 }
