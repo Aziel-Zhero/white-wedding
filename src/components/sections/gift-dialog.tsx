@@ -39,6 +39,7 @@ import { Separator } from "../ui/separator";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import { coupleId } from "@/lib/couple-data";
+import { ScrollArea } from "../ui/scroll-area";
 
 
 interface GiftDialogProps {
@@ -127,7 +128,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-4xl p-0">
+      <DialogContent className="w-[95%] max-w-4xl rounded-lg p-0">
         {isConfirmed ? (
            <div className="text-center p-8 md:p-12">
              <PartyPopper className="h-16 w-16 mx-auto text-primary" />
@@ -142,115 +143,117 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
              </Button>
            </div>
         ) : (
-          <div className="grid md:grid-cols-2">
-            <div className="hidden md:flex flex-col items-center justify-center p-6 md:p-8 bg-secondary/50 md:rounded-l-lg">
-                {gift.image && (
-                    <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border">
-                         <Image
-                            src={gift.image.imageUrl}
-                            alt={gift.name}
-                            fill
-                            className="object-cover"
-                            data-ai-hint={gift.image.imageHint}
-                        />
-                    </div>
-                )}
-                 <div className="mt-4 text-center">
-                    <p className="font-headline text-xl">{gift.name}</p>
-                    <p className="text-sm text-muted-foreground">{gift.description}</p>
-                 </div>
-            </div>
-
-            <div className="p-6 md:p-8 flex flex-col">
-                 <DialogHeader className="text-left">
-                    <DialogTitle className="font-headline text-2xl flex items-center gap-2">
-                        <Gift className="h-6 w-6 text-primary" /> Presentear
-                    </DialogTitle>
-                    <DialogDescription>
-                        Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar. Contribua com qualquer valor!
-                    </DialogDescription>
-                </DialogHeader>
-                
-                <Separator className="my-4" />
-
-                <div className="py-4 space-y-4 text-center">
-                    <div className="relative w-40 h-40 mx-auto border-4 border-primary rounded-lg overflow-hidden">
-                        <Image src={qrCodeImage} alt="QR Code PIX" width={300} height={300} objectFit="cover" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">Escaneie o QR Code acima ou copie a chave.</p>
-                    <div className="flex items-center justify-center p-3 bg-secondary rounded-md">
-                        <code className="text-xs text-secondary-foreground break-all">{pixKey}</code>
-                        <Button variant="ghost" size="icon" className="ml-2 h-8 w-8" onClick={copyPixKey}>
-                            <ClipboardCopy className="h-4 w-4" />
-                        </Button>
+          <ScrollArea className="max-h-[85vh]">
+            <div className="grid md:grid-cols-2 p-1">
+                <div className="hidden md:flex flex-col items-center justify-center p-6 md:p-8 bg-secondary/50 rounded-l-lg">
+                    {gift.image && (
+                        <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border">
+                            <Image
+                                src={gift.image.imageUrl}
+                                alt={gift.name}
+                                fill
+                                className="object-cover"
+                                data-ai-hint={gift.image.imageHint}
+                            />
+                        </div>
+                    )}
+                    <div className="mt-4 text-center">
+                        <p className="font-headline text-xl">{gift.name}</p>
+                        <p className="text-sm text-muted-foreground">{gift.description}</p>
                     </div>
                 </div>
 
-                <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-auto">
-                     <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Seu nome</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
+                <div className="p-6 md:p-8 flex flex-col">
+                    <DialogHeader className="text-left">
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                            <Gift className="h-6 w-6 text-primary" /> Presentear
+                        </DialogTitle>
+                        <DialogDescription>
+                            Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar. Contribua com qualquer valor!
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <Separator className="my-4" />
+
+                    <div className="py-4 space-y-4 text-center">
+                        <div className="relative w-40 h-40 mx-auto border-4 border-primary rounded-lg overflow-hidden">
+                            <Image src={qrCodeImage} alt="QR Code PIX" width={300} height={300} objectFit="cover" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">Escaneie o QR Code acima ou copie a chave.</p>
+                        <div className="flex items-center justify-center p-3 bg-secondary rounded-md">
+                            <code className="text-xs text-secondary-foreground break-all">{pixKey}</code>
+                            <Button variant="ghost" size="icon" className="ml-2 h-8 w-8 flex-shrink-0" onClick={copyPixKey}>
+                                <ClipboardCopy className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-auto">
+                        <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Seu nome</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {guestList.map((guest) => (
+                                    <SelectItem key={guest} value={guest}>
+                                    {guest}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="amount"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Valor da Contribuição (R$)</FormLabel>
                             <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
-                              </SelectTrigger>
+                                <Input type="number" placeholder={`Faltam R$ ${remainingAmount.toFixed(2)}`} {...field} onChange={event => field.onChange(event.target.value === '' ? undefined : +event.target.value)} />
                             </FormControl>
-                            <SelectContent>
-                              {guestList.map((guest) => (
-                                <SelectItem key={guest} value={guest}>
-                                  {guest}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Valor da Contribuição (R$)</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder={`Faltam R$ ${remainingAmount.toFixed(2)}`} {...field} onChange={event => field.onChange(event.target.value === '' ? undefined : +event.target.value)} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="proof"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Comprovante (Opcional)</FormLabel>
-                        <FormControl>
-                            <Input type="file" {...form.register('proof')} />
-                        </FormControl>
-                        <FormDescription>
-                            Anexe o comprovante do PIX (print ou PDF).
-                        </FormDescription>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <DialogFooter className="!mt-6">
-                    <Button type="submit" size="lg" className="w-full">
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        Confirmar Contribuição
-                    </Button>
-                    </DialogFooter>
-                </form>
-                </Form>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="proof"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Comprovante (Opcional)</FormLabel>
+                            <FormControl>
+                                <Input type="file" {...form.register('proof')} />
+                            </FormControl>
+                            <FormDescription>
+                                Anexe o comprovante do PIX (print ou PDF).
+                            </FormDescription>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <DialogFooter className="!mt-6">
+                        <Button type="submit" size="lg" className="w-full">
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Confirmar Contribuição
+                        </Button>
+                        </DialogFooter>
+                    </form>
+                    </Form>
+                </div>
             </div>
-          </div>
+          </ScrollArea>
         )}
       </DialogContent>
     </Dialog>
