@@ -45,7 +45,7 @@ import { ScrollArea } from "../ui/scroll-area";
 
 interface GiftDialogProps {
   gift: GiftType;
-  onConfirm: (giftId: string, amount: number) => void;
+  onConfirm: (giftId: string, amount: number, contributorName: string) => void;
   children: React.ReactNode;
 }
 
@@ -62,10 +62,8 @@ const giftFormSchema = z.object({
 
 type GiftFormValues = z.infer<typeof giftFormSchema>;
 
-// --- Mock Data ---
 const pixKey = "00020126440014br.gov.bcb.pix0122aziel_1994@hotmail.com5204000053039865802BR5924AZIELASAFFEOLIVEIRAPAULA6009Sao Paulo610901227-20062230519daqr22254342532843163048626";
 const qrCodeImage = "/qrcode.jpeg";
-// -----------------
 
 export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProps) {
   const [open, setOpen] = useState(false);
@@ -104,7 +102,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
 
   function onSubmit(data: GiftFormValues) {
-    onConfirm(gift.id, data.amount);
+    onConfirm(gift.id, data.amount, data.name);
     setIsConfirmed(true);
 
     toast({
@@ -117,7 +115,6 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-        // Reset state when closing
         setTimeout(() => {
             setIsConfirmed(false);
             form.reset();
@@ -160,7 +157,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                         <Gift className="h-6 w-6" /> Presentear
                       </h3>
                       <p className="text-muted-foreground mt-1">
-                        Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar.
+                        Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar. Contribua com qualquer valor!
                       </p>
                     </div>
 
@@ -252,18 +249,17 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                 <FormItem>
                                     <FormLabel>Comprovante (Opcional)</FormLabel>
                                     <div className="flex items-center gap-2">
-                                       <FormControl>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={() => proofInputRef.current?.click()}
-                                            >
-                                                <Upload className="mr-2 h-4 w-4" />
-                                                Escolher arquivo
-                                            </Button>
-                                        </FormControl>
+                                       <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => proofInputRef.current?.click()}
+                                        >
+                                            <Upload className="mr-2 h-4 w-4" />
+                                            Escolher arquivo
+                                        </Button>
                                         {fileName && <span className="text-sm text-muted-foreground truncate">{fileName}</span>}
                                     </div>
+                                    <FormControl>
                                      <Input
                                         type="file"
                                         className="hidden"
@@ -279,6 +275,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                             field.onChange(file ? event.target.files : null);
                                         }}
                                     />
+                                    </FormControl>
                                     <FormDescription>
                                         Anexe o comprovante do PIX (print ou PDF).
                                     </FormDescription>

@@ -1,5 +1,10 @@
 import type { ImagePlaceholder } from './placeholder-images';
 
+export type Contributor = {
+  name: string;
+  amount: number;
+}
+
 // This type will now be used across the app, but the data source will be Firestore.
 export type Gift = {
   id: string;
@@ -10,4 +15,5 @@ export type Gift = {
   imageUrl?: string; // Keep this optional as it might not always exist
   imageHint?: string;
   image?: ImagePlaceholder; // Keeping for compatibility with existing components
+  contributors?: Contributor[];
 };

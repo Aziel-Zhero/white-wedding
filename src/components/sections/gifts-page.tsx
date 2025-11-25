@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { collection, doc, updateDoc } from "firebase/firestore";
+import { collection, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { coupleId } from "@/lib/couple-data";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +30,7 @@ export default function GiftsPageSection() {
     }));
   }, [gifts]);
 
-  const handleConfirmGift = async (giftId: string, amount: number) => {
+  const handleConfirmGift = async (giftId: string, amount: number, contributorName: string) => {
     if (!gifts) return;
     const gift = gifts.find(g => g.id === giftId);
     if (!gift) return;
@@ -40,7 +40,8 @@ export default function GiftsPageSection() {
     
     // Non-blocking update
     updateDoc(giftRef, { 
-      contributedAmount: Math.min(newContributedAmount, gift.totalPrice) 
+      contributedAmount: Math.min(newContributedAmount, gift.totalPrice),
+      contributors: arrayUnion({ name: contributorName, amount: amount })
     });
   };
   

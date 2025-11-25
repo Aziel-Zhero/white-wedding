@@ -82,7 +82,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { type Gift as GiftType } from "@/lib/gifts-data";
+import { type Gift as GiftType, type Contributor } from "@/lib/gifts-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -162,7 +162,7 @@ export default function DashboardPage() {
     if (!gifts) return [];
     return gifts.map(gift => ({
         ...gift,
-        contributors: [], 
+        contributors: gift.contributors || [], 
         image: PlaceHolderImages.find(p => p.id === gift.id) || (gift.imageUrl ? { id: gift.id, imageUrl: gift.imageUrl, description: gift.name, imageHint: '' } : undefined)
     }));
   }, [gifts]);
@@ -172,14 +172,18 @@ export default function DashboardPage() {
   }, [gifts]);
   
   const receivedGifts = useMemo(() => {
-    return gifts
-      ?.filter(g => g.contributedAmount > 0)
-      .map(g => ({
-        id: g.id,
-        name: g.name,
-        amount: g.contributedAmount,
-        from: 'Contribuições'
-      })) ?? [];
+    if (!gifts) return [];
+    
+    return gifts.flatMap(gift => 
+        (gift.contributors || [])
+          .filter(c => c.amount > 0)
+          .map((contributor, index) => ({
+            id: `${gift.id}-${index}`, // Create a unique key for each row
+            name: gift.name,
+            amount: contributor.amount,
+            from: contributor.name,
+          }))
+      );
   }, [gifts]);
 
 
@@ -292,8 +296,7 @@ export default function DashboardPage() {
 
     if (editingGift) { // Update existing gift
         const giftDocRef = doc(firestore, "couples", coupleId, "gifts", editingGift.id);
-        // contributedAmount is not editable here, so we don't include it.
-        const updateData = { ...giftData, contributedAmount: editingGift.contributedAmount };
+        const updateData = { ...giftData, contributedAmount: editingGift.contributedAmount, contributors: editingGift.contributors || [] };
         
         updateDoc(giftDocRef, updateData)
             .then(() => {
@@ -306,7 +309,7 @@ export default function DashboardPage() {
             })
             .finally(() => setIsSavingGift(false));
     } else { // Add new gift
-        const newGiftData = { ...giftData, contributedAmount: 0 };
+        const newGiftData = { ...giftData, contributedAmount: 0, contributors: [] };
         addDoc(giftsRef, newGiftData)
             .then(() => {
                 toast({ title: "Presente Adicionado!", description: `"${giftName}" foi adicionado à sua lista.` });
@@ -747,9 +750,9 @@ export default function DashboardPage() {
                                     <TooltipContent>
                                       <p className="font-bold mb-1">Contribuições:</p>
                                       <ul className="list-disc pl-4">
-                                        {gift.contributors.map((c: any) => (
-                                          <li key={c.id} className="text-sm">
-                                            {c.from}: {c.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                                        {gift.contributors.map((c: Contributor, index: number) => (
+                                          <li key={index} className="text-sm">
+                                            {c.name}: {c.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                                           </li>
                                         ))}
                                       </ul>
