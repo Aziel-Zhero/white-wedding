@@ -154,7 +154,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
         ) : (
           <ScrollArea className="max-h-[90vh]">
             <div className="grid md:grid-cols-2">
-                <div className="flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
+                <div className="relative flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
                     {gift.image && (
                         <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
                             <Image
@@ -164,6 +164,14 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                 className="object-cover"
                                 data-ai-hint={gift.image.imageHint}
                             />
+                            <div className="absolute top-0 left-0 bg-black/50 text-white p-4 rounded-br-lg">
+                                <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                                    <Gift className="h-6 w-6" /> Presentear
+                                </DialogTitle>
+                                <DialogDescription className="text-white/90">
+                                    Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar.
+                                </DialogDescription>
+                            </div>
                         </div>
                     )}
                     <div className="mt-4 text-center">
@@ -174,11 +182,11 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
                 <div className="p-6 flex flex-col">
                     <DialogHeader className="text-left">
-                        <DialogTitle className="font-headline text-2xl flex items-center gap-2">
-                            <Gift className="h-6 w-6 text-primary" /> Presentear
+                        <DialogTitle className="font-headline text-2xl">
+                           Como Contribuir
                         </DialogTitle>
                         <DialogDescription>
-                            Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar. Contribua com qualquer valor!
+                            Você pode usar PIX QR Code, chave aleatória, ou preencher os dados abaixo para nos avisar da sua contribuição.
                         </DialogDescription>
                     </DialogHeader>
                     
@@ -204,7 +212,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Seu nome</FormLabel>
+                            <FormLabel>Seu nome (para o agradecimento)</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
                                 <FormControl>
                                 <SelectTrigger>
@@ -242,17 +250,17 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Comprovante (Opcional)</FormLabel>
-                                    <FormControl>
+                                    <div className="flex items-center gap-2">
                                         <Button
                                             type="button"
                                             variant="outline"
-                                            className="w-full"
                                             onClick={() => proofInputRef.current?.click()}
                                         >
                                             <Upload className="mr-2 h-4 w-4" />
-                                            {fileName ? <span className="truncate">{fileName}</span> : "Escolher arquivo"}
+                                            Escolher arquivo
                                         </Button>
-                                    </FormControl>
+                                        {fileName && <span className="text-sm text-muted-foreground truncate">{fileName}</span>}
+                                    </div>
                                      <Input
                                         type="file"
                                         className="hidden"
