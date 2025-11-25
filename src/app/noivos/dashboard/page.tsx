@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   addDoc,
   collection,
@@ -54,6 +55,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,10 +70,20 @@ import {
 import { type Gift as GiftType } from "@/lib/gifts-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 
 export default function DashboardPage() {
   const firestore = useFirestore();
+  const { toast } = useToast();
+
+  // --- Form State for New Gift ---
+  const [newGiftName, setNewGiftName] = useState("");
+  const [newGiftDescription, setNewGiftDescription] = useState("");
+  const [newGiftPrice, setNewGiftPrice] = useState("");
+  const [newGiftImageUrl, setNewGiftImageUrl] = useState("");
+  const [isSavingGift, setIsSavingGift] = useState(false);
+  const [isAddGiftOpen, setIsAddGiftOpen] = useState(false);
 
   // --- Firebase Data ---
   const guestsRef = useMemoFirebase(() => collection(firestore, "couples", coupleId, "guests"), [firestore]);
@@ -117,6 +129,51 @@ export default function DashboardPage() {
         from: 'Contribuições' // This would need a subcollection to be accurate
       })) ?? [];
   }, [gifts]);
+
+  const handleAddGift = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGiftName || !newGiftPrice) {
+      toast({
+        variant: "destructive",
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha o nome e o preço do presente.",
+      });
+      return;
+    }
+
+    setIsSavingGift(true);
+    try {
+      await addDoc(giftsRef, {
+        name: newGiftName,
+        description: newGiftDescription,
+        totalPrice: parseFloat(newGiftPrice),
+        contributedAmount: 0,
+        imageUrl: newGiftImageUrl,
+      });
+
+      toast({
+        title: "Presente adicionado!",
+        description: `"${newGiftName}" foi adicionado à sua lista.`,
+      });
+      
+      // Reset form and close dialog
+      setNewGiftName("");
+      setNewGiftDescription("");
+      setNewGiftPrice("");
+      setNewGiftImageUrl("");
+      setIsAddGiftOpen(false);
+
+    } catch (error) {
+      console.error("Error adding gift: ", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: "Não foi possível adicionar o presente. Tente novamente.",
+      });
+    } finally {
+      setIsSavingGift(false);
+    }
+  };
 
 
   const renderSkeleton = (rows = 5) => (
@@ -359,7 +416,56 @@ export default function DashboardPage() {
                   <h2 className="text-xl font-headline font-bold flex items-center gap-2">
                     <ListPlus /> Itens da sua Lista
                   </h2>
-                   {/* Add Gift Dialog Here */}
+                   <Dialog open={isAddGiftOpen} onOpenChange={setIsAddGiftOpen}>
+                    <DialogTrigger asChild>
+                      <Button>Adicionar Presente</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[480px]">
+                      <DialogHeader>
+                        <DialogTitle>Adicionar Novo Presente</DialogTitle>
+                        <DialogDescription>
+                          Preencha os detalhes do novo item para a sua lista de presentes.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleAddGift}>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="gift-name" className="text-right">
+                              Nome
+                            </Label>
+                            <Input id="gift-name" value={newGiftName} onChange={(e) => setNewGiftName(e.target.value)} className="col-span-3" required />
+                          </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="gift-description" className="text-right">
+                              Descrição
+                            </Label>
+                            <Textarea id="gift-description" value={newGiftDescription} onChange={(e) => setNewGiftDescription(e.target.value)} className="col-span-3" />
+                          </div>
+                           <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="gift-price" className="text-right">
+                              Preço (R$)
+                            </Label>
+                            <Input id="gift-price" type="number" step="0.01" value={newGiftPrice} onChange={(e) => setNewGiftPrice(e.target.value)} className="col-span-3" required />
+                          </div>
+                           <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="gift-image" className="text-right">
+                              URL da Imagem
+                            </Label>
+                            <Input id="gift-image" placeholder="Opcional" value={newGiftImageUrl} onChange={(e) => setNewGiftImageUrl(e.target.value)} className="col-span-3" />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button type="button" variant="secondary">Cancelar</Button>
+                          </DialogClose>
+                          <Button type="submit" disabled={isSavingGift}>
+                            {isSavingGift ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {isSavingGift ? 'Salvando...' : 'Salvar Presente'}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                   </Dialog>
                 </div>
                 <Card>
                   <CardContent className="p-0">
@@ -450,3 +556,5 @@ export default function DashboardPage() {
     </TooltipProvider>
   );
 }
+
+    
