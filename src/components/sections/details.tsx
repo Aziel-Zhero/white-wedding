@@ -27,8 +27,8 @@ export default function DetailsSection() {
               <p className="font-bold text-lg text-foreground">Sábado, 16 de Maio de 2026</p>
               <p>às 15:30 horas</p>
               <Separator className="my-4" />
-              <p className="font-semibold">Chácara Recanto Sonho Meu</p>
-              <p>Estrada Municipal Romeu de Campos, Pindamonhangaba - SP</p>
+              <p className="font-semibold">Chácara Recanto Verde</p>
+              <p>Estr. Mun. Jorge Emílio Vieira - Pindamonhangaba, SP</p>
             </CardContent>
           </Card>
 
@@ -43,8 +43,8 @@ export default function DetailsSection() {
               <p className="font-bold text-lg text-foreground">Sábado, 16 de Maio de 2026</p>
               <p>após a cerimônia</p>
               <Separator className="my-4" />
-              <p className="font-semibold">Chácara Recanto Sonho Meu</p>
-              <p>Estrada Municipal Romeu de Campos, Pindamonhangaba - SP</p>
+              <p className="font-semibold">Chácara Recanto Verde</p>
+              <p>Estr. Mun. Jorge Emílio Vieira - Pindamonhangaba, SP</p>
             </CardContent>
           </Card>
         </div>
