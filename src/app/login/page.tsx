@@ -40,11 +40,7 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      toast({
-        title: "Login bem-sucedido!",
-        description: "Redirecionando para o painel...",
-      });
-      // The useEffect will handle the redirect
+      // O useEffect cuidará do redirecionamento
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -62,14 +58,14 @@ export default function LoginPage() {
 
     try {
       await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
+      // Após o sucesso do cadastro, o Firebase faz o login automaticamente.
+      // O useEffect detectará a mudança no 'user' e redirecionará.
       toast({
         title: "Cadastro realizado com sucesso!",
-        description: "Você já pode fazer o login.",
+        description: "Redirecionando para o painel...",
       });
-      setRegisterEmail("");
-      setRegisterPassword("");
-      setActiveTab("login"); // Switch to login tab
-    } catch (error: any) {
+    } catch (error: any)
+    {
       console.error("Registration error:", error);
       let description = "Ocorreu um erro ao criar a conta.";
       if (error.code === 'auth/email-already-in-use') {
@@ -82,9 +78,10 @@ export default function LoginPage() {
         title: "Erro no cadastro",
         description: description,
       });
-    } finally {
-        setIsLoading(false);
+       setIsLoading(false);
     }
+    // Não definimos setIsLoading(false) aqui no sucesso,
+    // pois o redirecionamento acontecerá em seguida.
   };
 
   if (isUserLoading || user) {
