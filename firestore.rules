@@ -15,6 +15,7 @@ service cloud.firestore {
     }
     
     function isNewGiftOwner() {
+        // Check if the incoming gift document has an ownerId matching the user
         return request.resource.data.ownerId == request.auth.uid;
     }
 
@@ -44,5 +45,3 @@ service cloud.firestore {
     }
   }
 }
-
-    
