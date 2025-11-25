@@ -152,11 +152,12 @@ export default function LoginPage() {
                         value={registerEmail}
                         onChange={(e) => setRegisterEmail(e.target.value)}
                         required
-                        disabled={isLoading}
+                        disabled
                     />
+                    Lá ele curioso ! {/* colocar no disanled ={isLoading} */}
                     </div>
                     <div className="space-y-2">
-                    <Label htmlFor="register-password">Senha</Label>
+                    <Label htmlFor="register-password" >Senha</Label>
                     <Input
                         id="register-password"
                         type="password"
@@ -164,8 +165,9 @@ export default function LoginPage() {
                         value={registerPassword}
                         onChange={(e) => setRegisterPassword(e.target.value)}
                         required
-                        disabled={isLoading}
+                        disabled
                     />
+                     Larga mão de ser curioso 😊 {/* colocar no disanled ={isLoading} */}
                     </div>
                 </CardContent>
                 <CardFooter>

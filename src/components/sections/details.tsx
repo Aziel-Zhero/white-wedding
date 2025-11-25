@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Church, Glasses } from "lucide-react";
+import Countdown from "./countdown";
 
 export default function DetailsSection() {
   return (
@@ -15,7 +16,9 @@ export default function DetailsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8">
+        <Countdown />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8 mt-12">
           <Card className="text-center shadow-xl transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
               <div className="mx-auto bg-primary/20 p-4 rounded-full w-fit">
