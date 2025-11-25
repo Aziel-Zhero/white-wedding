@@ -37,11 +37,10 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setActiveTab("login"); // Ensure loading state is shown on the correct button
+    setActiveTab("login"); 
 
     try {
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      // O useEffect cuidará do redirecionamento
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -56,12 +55,10 @@ export default function LoginPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setActiveTab("register"); // Ensure loading state is shown on the correct button
+    setActiveTab("register");
 
     try {
       await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
-      // Após o sucesso do cadastro, o Firebase faz o login automaticamente.
-      // O useEffect detectará a mudança no 'user' e redirecionará.
       toast({
         title: "Cadastro realizado com sucesso!",
         description: "Redirecionando para o painel...",
@@ -81,8 +78,6 @@ export default function LoginPage() {
       });
       setIsLoading(false);
     }
-    // Não definimos setIsLoading(false) aqui no sucesso,
-    // pois o redirecionamento acontecerá em seguida.
   };
 
   if (isUserLoading || user) {
@@ -93,95 +88,95 @@ export default function LoginPage() {
     );
   }
 
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <Heart className="mx-auto h-10 w-10 text-primary" />
-          <CardTitle className="font-headline text-3xl mt-4">Área dos Noivos</CardTitle>
-          <CardDescription>Acesse ou crie sua conta para gerenciar o casamento.</CardDescription>
-        </CardHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Entrar</TabsTrigger>
-            <TabsTrigger value="register">Criar Conta</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="login">
-            <form onSubmit={handleLogin}>
-              <CardContent className="space-y-4 pt-6">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="noivos@casamento.com"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Senha</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="********"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && activeTab === 'login' ? "Entrando..." : "Entrar"}
-                </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-sm">
+        <Card>
+            <CardHeader className="text-center">
+              <Heart className="mx-auto h-10 w-10 text-primary" />
+              <CardTitle className="font-headline text-3xl mt-4">Área dos Noivos</CardTitle>
+              <CardDescription>Acesse ou crie sua conta para gerenciar o casamento.</CardDescription>
+            </CardHeader>
+            <CardContent className="pb-2">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="login">Entrar</TabsTrigger>
+                    <TabsTrigger value="register">Criar Conta</TabsTrigger>
+                </TabsList>
+            </CardContent>
+            
+            <TabsContent value="login">
+                <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                    <Label htmlFor="login-email">Email</Label>
+                    <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="noivos@casamento.com"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        required
+                        disabled={isLoading}
+                    />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="login-password">Senha</Label>
+                    <Input
+                        id="login-password"
+                        type="password"
+                        placeholder="********"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        required
+                        disabled={isLoading}
+                    />
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && activeTab === 'login' ? "Entrando..." : "Entrar"}
+                    </Button>
+                </CardFooter>
+                </form>
+            </TabsContent>
 
-          <TabsContent value="register">
-            <form onSubmit={handleRegister}>
-              <CardContent className="space-y-4 pt-6">
-                <div className="space-y-2">
-                  <Label htmlFor="register-email">Email</Label>
-                  <Input
-                    id="register-email"
-                    type="email"
-                    placeholder="seu.email@exemplo.com"
-                    value={registerEmail}
-                    onChange={(e) => setRegisterEmail(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-password">Senha</Label>
-                  <Input
-                    id="register-password"
-                    type="password"
-                    placeholder="Crie uma senha forte (mín. 6 caracteres)"
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && activeTab === 'register' ? "Criando conta..." : "Criar Conta"}
-                </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
-      </Card>
+            <TabsContent value="register">
+                <form onSubmit={handleRegister}>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                    <Label htmlFor="register-email">Email</Label>
+                    <Input
+                        id="register-email"
+                        type="email"
+                        placeholder="seu.email@exemplo.com"
+                        value={registerEmail}
+                        onChange={(e) => setRegisterEmail(e.target.value)}
+                        required
+                        disabled={isLoading}
+                    />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="register-password">Senha</Label>
+                    <Input
+                        id="register-password"
+                        type="password"
+                        placeholder="Crie uma senha forte (mín. 6 caracteres)"
+                        value={registerPassword}
+                        onChange={(e) => setRegisterPassword(e.target.value)}
+                        required
+                        disabled={isLoading}
+                    />
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && activeTab === 'register' ? "Criando conta..." : "Criar Conta"}
+                    </Button>
+                </CardFooter>
+                </form>
+            </TabsContent>
+        </Card>
+      </Tabs>
     </div>
   );
 }
