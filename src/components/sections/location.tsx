@@ -31,7 +31,7 @@ export default function LocationSection() {
         
         <div className="aspect-video w-full rounded-lg overflow-hidden shadow-lg border">
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.61118182967!2d-45.47413082379766!3d-23.11142204561081!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cc679383633653%3A0x85352848a658f863!2sCh%C3%A1cara%20Recanto%20Verde!5e0!3m2!1spt-BR!2sbr!4v1764032062535!5m2!1spt-BR!2sbr" 
+            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3090.8376912376084!2d-45.47452674119939!3d-22.889525430707515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1764031687872!5m2!1spt-BR!2sbr" 
             width="100%" 
             height="100%" 
             style={{border:0}} 
