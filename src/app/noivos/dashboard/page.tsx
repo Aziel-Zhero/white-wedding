@@ -22,7 +22,7 @@ import {
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError } from "@/firebase";
 import { coupleId } from "@/lib/couple-data";
 import {
   Card,
@@ -142,37 +142,40 @@ export default function DashboardPage() {
     }
 
     setIsSavingGift(true);
-    try {
-      await addDoc(giftsRef, {
-        name: newGiftName,
-        description: newGiftDescription,
-        totalPrice: parseFloat(newGiftPrice),
-        contributedAmount: 0,
-        imageUrl: newGiftImageUrl,
-      });
 
-      toast({
-        title: "Presente adicionado!",
-        description: `"${newGiftName}" foi adicionado à sua lista.`,
-      });
-      
-      // Reset form and close dialog
-      setNewGiftName("");
-      setNewGiftDescription("");
-      setNewGiftPrice("");
-      setNewGiftImageUrl("");
-      setIsAddGiftOpen(false);
+    const newGiftData = {
+      name: newGiftName,
+      description: newGiftDescription,
+      totalPrice: parseFloat(newGiftPrice),
+      contributedAmount: 0,
+      imageUrl: newGiftImageUrl,
+    };
 
-    } catch (error) {
-      console.error("Error adding gift: ", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao salvar",
-        description: "Não foi possível adicionar o presente. Tente novamente.",
+    addDoc(giftsRef, newGiftData)
+      .then(() => {
+        toast({
+          title: "Presente adicionado!",
+          description: `"${newGiftName}" foi adicionado à sua lista.`,
+        });
+        
+        // Reset form and close dialog
+        setNewGiftName("");
+        setNewGiftDescription("");
+        setNewGiftPrice("");
+        setNewGiftImageUrl("");
+        setIsAddGiftOpen(false);
+      })
+      .catch((error) => {
+        const permissionError = new FirestorePermissionError({
+          path: giftsRef.path,
+          operation: 'create',
+          requestResourceData: newGiftData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setIsSavingGift(false);
       });
-    } finally {
-      setIsSavingGift(false);
-    }
   };
 
 
@@ -555,6 +558,5 @@ export default function DashboardPage() {
       </Tabs>
     </TooltipProvider>
   );
-}
 
     
