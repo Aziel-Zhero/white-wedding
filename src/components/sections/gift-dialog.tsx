@@ -80,7 +80,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   const proofInputRef = useRef<HTMLInputElement>(null);
 
 
-  const guestList = guests ? [...guests.map(g => g.name), 'Anônimo'] : ['Anônimo'];
+  const guestList = guests ? guests.map(g => g.name) : [];
 
   const remainingAmount = gift.totalPrice - gift.contributedAmount;
 
@@ -155,14 +155,14 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
           <ScrollArea className="max-h-[90vh]">
             <div className="grid md:grid-cols-2">
                 <div className="relative flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
-                    <DialogHeader className="text-left mb-4">
-                      <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                     <div className="text-left mb-4">
+                      <h3 className="font-headline text-2xl flex items-center gap-2">
                         <Gift className="h-6 w-6" /> Presentear
-                      </DialogTitle>
-                      <DialogDescription>
+                      </h3>
+                      <p className="text-muted-foreground mt-1">
                         Falta <strong>R$ {remainingAmount.toFixed(2)}</strong> para completar.
-                      </DialogDescription>
-                    </DialogHeader>
+                      </p>
+                    </div>
 
                     {gift.image && (
                         <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
@@ -245,14 +245,14 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                             </FormItem>
                         )}
                         />
-                        <FormField
+                       <FormField
                             control={form.control}
                             name="proof"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Comprovante (Opcional)</FormLabel>
-                                    <FormControl>
-                                        <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2">
+                                       <FormControl>
                                             <Button
                                                 type="button"
                                                 variant="outline"
@@ -261,9 +261,9 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                                 <Upload className="mr-2 h-4 w-4" />
                                                 Escolher arquivo
                                             </Button>
-                                            {fileName && <span className="text-sm text-muted-foreground truncate">{fileName}</span>}
-                                        </div>
-                                    </FormControl>
+                                        </FormControl>
+                                        {fileName && <span className="text-sm text-muted-foreground truncate">{fileName}</span>}
+                                    </div>
                                      <Input
                                         type="file"
                                         className="hidden"
