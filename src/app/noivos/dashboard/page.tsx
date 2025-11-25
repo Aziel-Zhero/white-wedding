@@ -15,7 +15,7 @@ import {
   Edit,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import {
   addDoc,
@@ -26,7 +26,8 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import { useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError, useUser } from "@/firebase";
+import { useAuth, useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError, useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
 import { coupleId } from "@/lib/couple-data";
 import {
   Card,
@@ -96,6 +97,8 @@ type GuestType = {
 
 export default function DashboardPage() {
   const firestore = useFirestore();
+  const auth = useAuth();
+  const router = useRouter();
   const { toast } = useToast();
   const { user } = useUser();
 
@@ -214,7 +217,7 @@ export default function DashboardPage() {
     if (editingGuest) { // Update existing guest
         const guestDocRef = doc(firestore, "couples", coupleId, "guests", editingGuest.id);
         const updatedData = { name: guestName, email: guestEmail };
-        updateDoc(guestDocRef)
+        updateDoc(guestDocRef, updatedData)
             .then(() => {
                 toast({ title: "Convidado Atualizado!", description: `"${guestName}" foi atualizado com sucesso.` });
                 setIsGuestDialogOpen(false);
@@ -342,6 +345,20 @@ export default function DashboardPage() {
       });
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: "Não foi possível encerrar a sessão. Tente novamente."
+      });
+    }
+  };
+
   const renderSkeleton = (rows = 5) => (
     Array.from({ length: rows }).map((_, index) => (
       <TableRow key={index}>
@@ -362,11 +379,9 @@ export default function DashboardPage() {
               <Heart className="h-6 w-6 text-primary" />
               <h1 className="text-lg sm:text-xl font-semibold font-headline">Painel dos Noivos</h1>
             </div>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/">
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Sair
-              </Link>
             </Button>
           </div>
           <div className="w-full overflow-x-auto">
