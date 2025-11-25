@@ -4,11 +4,15 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Couple",
       "type": "object",
-      "description": "Represents the couple getting married.",
+      "description": "Represents the couple getting married. This is the root entity for a wedding.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Couple entity."
+          "description": "Unique identifier for the Couple entity, typically a URL-friendly slug."
+        },
+        "ownerId": {
+            "type": "string",
+            "description": "The Firebase Auth UID of the user who owns and manages this couple's data."
         },
         "groomName": {
           "type": "string",
@@ -35,91 +39,56 @@
       },
       "required": [
         "id",
+        "ownerId",
         "groomName",
         "brideName",
         "weddingDate"
       ]
     },
-    "Venue": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Venue",
+    "Guest": {
+      "title": "Guest",
       "type": "object",
-      "description": "Represents the venue for the wedding ceremony or reception.",
+      "description": "Represents a guest invited to the wedding.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Venue entity."
-        },
-        "coupleId": {
-          "type": "string",
-          "description": "Reference to Couple. (Relationship: Couple 1:N Venue)"
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the venue."
-        },
-        "address": {
-          "type": "string",
-          "description": "Address of the venue."
-        },
-        "googleMapsLink": {
-          "type": "string",
-          "description": "Link to the venue's location on Google Maps.",
-          "format": "uri"
-        },
-        "type": {
-          "type": "string",
-          "description": "Type of venue. Example: ceremony, party"
-        }
+        "id": { "type": "string" },
+        "coupleId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "status": { "type": "string", "enum": ["Pendente", "Confirmado", "Recusado"] }
       },
-      "required": [
-        "id",
-        "coupleId",
-        "name",
-        "address",
-        "googleMapsLink"
-      ]
+      "required": ["id", "coupleId", "name", "status"]
     },
     "Gift": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Gift",
       "type": "object",
-      "description": "Represents a gift suggestion for the wedding.",
+      "description": "Represents a gift in the couple's registry.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Gift entity."
-        },
-        "coupleId": {
-          "type": "string",
-          "description": "Reference to Couple. (Relationship: Couple 1:N Gift)"
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the gift."
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of the gift."
-        },
-        "link": {
-          "type": "string",
-          "description": "Link to purchase the gift (optional).",
-          "format": "uri"
-        }
+        "id": { "type": "string" },
+        "coupleId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "totalPrice": { "type": "number" },
+        "contributedAmount": { "type": "number" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "imageHint": { "type": "string" }
       },
-      "required": [
-        "id",
-        "coupleId",
-        "name",
-        "description"
-      ]
+      "required": ["id", "coupleId", "name", "totalPrice", "contributedAmount"]
+    },
+    "RSVP": {
+      "title": "RSVP",
+      "type": "object",
+      "description": "Represents a confirmation of attendance from a guest.",
+      "properties": {
+        "id": { "type": "string" },
+        "coupleId": { "type": "string" },
+        "guestName": { "type": "string" }
+      },
+      "required": ["id", "coupleId", "guestName"]
     }
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {
@@ -128,59 +97,34 @@
         "path": "/couples/{coupleId}",
         "definition": {
           "entityName": "Couple",
-          "schema": {
-            "$ref": "#/backend/entities/Couple"
-          },
-          "description": "Stores information about the couple. This is the root document for all couple-specific data.",
-          "params": [
-            {
-              "name": "coupleId",
-              "description": "The unique identifier of the couple."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Couple" },
+          "description": "Stores the main information about the couple and their wedding."
         }
       },
       {
-        "path": "/couples/{coupleId}/venues/{venueId}",
+        "path": "/couples/{coupleId}/guests/{guestId}",
         "definition": {
-          "entityName": "Venue",
-          "schema": {
-            "$ref": "#/backend/entities/Venue"
-          },
-          "description": "Stores venue information for a specific couple.  Venues are children of the couples document.",
-          "params": [
-            {
-              "name": "coupleId",
-              "description": "The unique identifier of the couple."
-            },
-            {
-              "name": "venueId",
-              "description": "The unique identifier of the venue."
-            }
-          ]
+          "entityName": "Guest",
+          "schema": { "$ref": "#/backend/entities/Guest" },
+          "description": "Stores the list of guests for a specific couple."
         }
       },
       {
         "path": "/couples/{coupleId}/gifts/{giftId}",
         "definition": {
           "entityName": "Gift",
-          "schema": {
-            "$ref": "#/backend/entities/Gift"
-          },
-          "description": "Stores gift information for a specific couple.  Gifts are children of the couples document.",
-          "params": [
-            {
-              "name": "coupleId",
-              "description": "The unique identifier of the couple."
-            },
-            {
-              "name": "giftId",
-              "description": "The unique identifier of the gift."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Gift" },
+          "description": "Stores the gift registry for a specific couple."
+        }
+      },
+      {
+        "path": "/couples/{coupleId}/rsvps/{rsvpId}",
+        "definition": {
+          "entityName": "RSVP",
+          "schema": { "$ref": "#/backend/entities/RSVP" },
+          "description": "Stores RSVP confirmations for a specific couple."
         }
       }
-    ],
-    "reasoning": "The Firestore data structure is designed to be simple and secure, primarily utilizing path-based ownership for user data.  The structure is optimized for the use case of wedding invitation websites created for individual couples. Authorization Independence is achieved by avoiding `get()` calls in the rules; there's no reliance on data in parent documents. The structure supports the QAPs by ensuring clear segregation of data (each couple has their own top-level document), which allows listing operations to be secured and efficient.  Since the application focuses on individual couple's data, a dedicated collection for couples is utilized."
+    ]
   }
 }

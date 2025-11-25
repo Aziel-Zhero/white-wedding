@@ -2,138 +2,38 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * Core Philosophy: This ruleset establishes a "Public Read, Owner Write" security model.
-     * All information related to a specific wedding (couple details, venues, gifts) is publicly
-     * readable by anyone, including anonymous users (e.g., guests). However, all write
-     * operations (creating, updating, or deleting wedding information) are strictly
-     * limited to the authenticated user who "owns" the couple's data.
-     *
-     * Data Structure: All data is organized under the top-level `/couples` collection.
-     * Each couple has a unique document (`/couples/{coupleId}`), which acts as the root for
-     * its related subcollections, such as `/venues` and `/gifts`.
-     *
-     * Key Security Decisions:
-     * - Public Read Access: To allow guests to view the wedding website without logging in,
-     *   all read operations (`get`, `list`) on all collections are permitted.
-     * - Ownership-Based Writes: Write access is controlled by an `ownerId` field, which MUST
-     *   be present on the root `/couples/{coupleId}` document. This `ownerId` must match
-     *   the UID of the authenticated user trying to make a change.
-     * - Inherited Subcollection Security: The security for subcollections (`venues`, `gifts`)
-     *   is inherited from their parent `couple` document. A `get()` call is used to check the
-     *   parent's `ownerId` before allowing any writes to subcollection documents. This ensures
-     *   consistent ownership across the entire data tree for a couple.
-     *
-     * Denormalization for Authorization:
-     * - CRITICAL: The security of this entire ruleset depends on a denormalized `ownerId` field
-     *   (containing the authenticated user's UID) being present on every `/couples/{coupleId}` document.
-     *   The provided schema is missing this field. The rules for writing to the `couples` collection
-     *   are disabled with a `TODO` to alert the developer to this requirement.
-     *
-     * Structural Segregation: This pattern is not used. All data for a couple is treated as
-     * a single unit with public read permissions.
-     */
-
-    //-------------------------------------------------------------------------
-    // Helper Functions
-    //-------------------------------------------------------------------------
-
-    /**
-     * Returns true if the user is authenticated.
-     */
+    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Returns true if the document exists in Firestore.
-     * Used for safe update and delete operations.
-     */
-    function isExistingDoc() {
-      return resource != null;
+    function isOwner(coupleId) {
+      return isSignedIn() && get(/databases/$(database)/documents/couples/$(coupleId)).data.ownerId == request.auth.uid;
     }
 
-    /**
-     * Checks if the currently authenticated user is the owner of a specific couple's data.
-     * It does this by reading the `ownerId` field from the parent couple document.
-     * Note: This function performs a billable read operation.
-     */
-    function isCoupleOwner(coupleId) {
-      let coupleData = get(/databases/$(database)/documents/couples/$(coupleId)).data;
-      return isSignedIn() && coupleData.ownerId == request.auth.uid;
-    }
-
-    /**
-     * For subcollection create operations:
-     * Validates that the `coupleId` field in the new document's data matches the
-     * `coupleId` from the URL path, ensuring relational integrity.
-     */
-    function hasValidCoupleIdOnCreate(coupleId) {
-      return request.resource.data.coupleId == coupleId;
-    }
-
-    /**
-     * For subcollection update operations:
-     * Enforces that the `coupleId` field is immutable and cannot be changed after creation.
-     */
-    function isCoupleIdImmutable() {
-      return request.resource.data.coupleId == resource.data.coupleId;
-    }
-
-    //-------------------------------------------------------------------------
-    // Collection Rules
-    //-------------------------------------------------------------------------
-
-    /**
-     * @description Controls access to the root document for a couple's wedding information.
-     * @path /couples/{coupleId}
-     * @allow (get) Anyone can read a couple's information.
-     * @deny (create) An unauthenticated user tries to create a couple profile.
-     * @principle Public Read with Owner-Only Writes. Writes are currently disabled pending schema update.
-     */
+    // Rules for the 'couples' collection
     match /couples/{coupleId} {
-      allow get: if true;
-      allow list: if true; // Allows listing of subcollections, not top-level couples.
+      allow read: if true;
+      allow write: if isOwner(coupleId);
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
 
-      // CRITICAL: Cannot implement owner-only writes. The 'Couple' entity is missing an 'ownerId' field.
-      // The `ownerId` should store the UID of the user who is allowed to manage this wedding data.
-      allow create: if false; // TODO: Add owner validation. Intended rule: `isSignedIn() && request.resource.data.ownerId == request.auth.uid;`
-      allow update: if false; // TODO: Add owner validation. Intended rule: `isCoupleOwner(coupleId) && isExistingDoc();`
-      allow delete: if false; // TODO: Add owner validation. Intended rule: `isCoupleOwner(coupleId) && isExistingDoc();`
-    }
+      // Rules for subcollections of a couple
+      match /guests/{guestId} {
+        allow read: if true;
+        allow write: if isOwner(coupleId);
+      }
 
-    /**
-     * @description Controls access to wedding venue information.
-     * @path /couples/{coupleId}/venues/{venueId}
-     * @allow (get) Any guest can view the venue details.
-     * @allow (create) auth: {uid: 'user123'}. The owner of couple 'c1' creates a venue. `isCoupleOwner('c1')` is true.
-     * @deny (update) auth: {uid: 'user456'}. A different user tries to update a venue for couple 'c1'. `isCoupleOwner('c1')` is false.
-     * @principle Inherits ownership from the parent /couples/{coupleId} document for all write operations.
-     */
-    match /couples/{coupleId}/venues/{venueId} {
-      allow get: if true;
-      allow list: if true;
-
-      allow create: if isCoupleOwner(coupleId) && hasValidCoupleIdOnCreate(coupleId);
-      allow update: if isCoupleOwner(coupleId) && isExistingDoc() && isCoupleIdImmutable();
-      allow delete: if isCoupleOwner(coupleId) && isExistingDoc();
-    }
-
-    /**
-     * @description Controls access to the couple's gift registry.
-     * @path /couples/{coupleId}/gifts/{giftId}
-     * @allow (get) Any guest can view the gift list.
-     * @allow (create) auth: {uid: 'user123'}. The owner of couple 'c1' adds a gift. `isCoupleOwner('c1')` is true.
-     * @deny (delete) auth: {uid: 'user456'}. A different user tries to delete a gift for couple 'c1'. `isCoupleOwner('c1')` is false.
-     * @principle Inherits ownership from the parent /couples/{coupleId} document for all write operations.
-     */
-    match /couples/{coupleId}/gifts/{giftId} {
-      allow get: if true;
-      allow list: if true;
-
-      allow create: if isCoupleOwner(coupleId) && hasValidCoupleIdOnCreate(coupleId);
-      allow update: if isCoupleOwner(coupleId) && isExistingDoc() && isCoupleIdImmutable();
-      allow delete: if isCoupleOwner(coupleId) && isExistingDoc();
+      match /gifts/{giftId} {
+        allow read: if true;
+        allow write: if isOwner(coupleId);
+        // Allow anyone to update the contributed amount (for gift contribution)
+        allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['contributedAmount']);
+      }
+      
+      match /rsvps/{rsvpId} {
+        allow read: if isOwner(coupleId);
+        allow create: if true; // Anyone can RSVP
+      }
     }
   }
 }
