@@ -28,7 +28,8 @@ service cloud.firestore {
       // Rules for subcollections of a couple
       match /guests/{guestId} {
         allow read: if true;
-        allow write: if isOwner(coupleId);
+        allow create: if isOwner(coupleId);
+        allow update, delete: if isOwner(coupleId);
       }
 
       match /gifts/{giftId} {
@@ -39,7 +40,7 @@ service cloud.firestore {
       }
       
       match /rsvps/{rsvpId} {
-        allow read: if isSignedIn(); 
+        allow read: if isSignedIn();
         allow create: if true; // Anyone can RSVP
       }
     }
