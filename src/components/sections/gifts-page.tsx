@@ -1,36 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
+import { collection, doc, updateDoc } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { coupleId } from "@/lib/couple-data";
 import { Card, CardContent } from "@/components/ui/card";
-import { Gift, CheckCircle } from "lucide-react";
-import { AllGifts, type Gift as GiftType } from "@/lib/gifts-data";
+import { Gift, CheckCircle, Loader2 } from "lucide-react";
+import { type Gift as GiftType } from "@/lib/gifts-data";
 import GiftDialog from "./gift-dialog";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 export default function GiftsPageSection() {
-  const [gifts, setGifts] = useState<GiftType[]>(AllGifts);
+  const firestore = useFirestore();
 
-  const handleConfirmGift = (giftId: string, amount: number) => {
-    setGifts(currentGifts => 
-      currentGifts.map(gift => {
-        if (gift.id === giftId) {
-          const newContributedAmount = gift.contributedAmount + amount;
-          return { 
-            ...gift, 
-            contributedAmount: Math.min(newContributedAmount, gift.totalPrice) 
-          };
-        }
-        return gift;
-      })
-    );
+  const giftsRef = useMemoFirebase(() => collection(firestore, 'couples', coupleId, 'gifts'), [firestore]);
+  const { data: gifts, isLoading: isLoadingGifts } = useCollection<GiftType>(giftsRef);
+  
+  const giftsWithImages = useMemo(() => {
+    if (!gifts) return [];
+    return gifts.map(gift => ({
+      ...gift,
+      image: PlaceHolderImages.find(p => p.id === gift.id) || (gift.imageUrl ? { id: gift.id, imageUrl: gift.imageUrl, description: gift.name, imageHint: '' } : undefined)
+    }));
+  }, [gifts]);
+
+  const handleConfirmGift = async (giftId: string, amount: number) => {
+    if (!gifts) return;
+    const gift = gifts.find(g => g.id === giftId);
+    if (!gift) return;
+
+    const giftRef = doc(firestore, "couples", coupleId, "gifts", giftId);
+    const newContributedAmount = (gift.contributedAmount || 0) + amount;
+    
+    // Non-blocking update
+    updateDoc(giftRef, { 
+      contributedAmount: Math.min(newContributedAmount, gift.totalPrice) 
+    });
   };
   
   const formatCurrency = (value: number) => {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
+
+  const renderSkeleton = (count = 8) => (
+     Array.from({ length: count }).map((_, index) => (
+        <Card key={index} className="overflow-hidden shadow-lg flex flex-col rounded-lg">
+          <Skeleton className="aspect-square w-full" />
+          <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
+             <Skeleton className="h-6 w-3/4 mb-2" />
+             <Skeleton className="h-4 w-full mb-1" />
+             <Skeleton className="h-4 w-5/6 mb-4" />
+             <div className="mt-auto">
+                <div className="flex justify-between items-end mb-1">
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+                <Skeleton className="h-2 w-full mb-4" />
+                <Skeleton className="h-10 w-full rounded-md" />
+             </div>
+          </CardContent>
+        </Card>
+     ))
+  )
 
   return (
     <section id="presentes-loja" className="py-20 lg:py-32">
@@ -47,7 +83,7 @@ export default function GiftsPageSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {gifts.map((gift) => {
+          {isLoadingGifts ? renderSkeleton() : giftsWithImages.map((gift) => {
             const progress = (gift.contributedAmount / gift.totalPrice) * 100;
             const remaining = gift.totalPrice - gift.contributedAmount;
             const isGifted = remaining <= 0;
@@ -105,7 +141,7 @@ export default function GiftsPageSection() {
 
                   <GiftDialog gift={gift} onConfirm={handleConfirmGift}>
                     <Button className="mt-4 w-full" disabled={isGifted}>
-                      {isGifted ? "Obrigado!" : (isPartiallyGifted ? "Interar na vaquinha!" : "Presentear")}
+                      {isGifted ? "Obrigado!" : (isPartiallyGifted ? "Contribuir na vaquinha!" : "Presentear")}
                     </Button>
                   </GiftDialog>
 

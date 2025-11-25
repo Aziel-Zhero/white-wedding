@@ -36,6 +36,10 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper, ClipboardCopy, Gift } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
 import { Separator } from "../ui/separator";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
+import { coupleId } from "@/lib/couple-data";
+
 
 interface GiftDialogProps {
   gift: GiftType;
@@ -59,19 +63,18 @@ type GiftFormValues = z.infer<typeof giftFormSchema>;
 // --- Mock Data ---
 const pixKey = "00020126440014br.gov.bcb.pix0122aziel_1994@hotmail.com5204000053039865802BR5924AZIELASAFFEOLIVEIRAPAULA6009Sao Paulo610901227-20062230519daqr22254342532843163048626";
 const qrCodeImage = "/qrcode.jpeg";
-const guestList = [
-  "Thaina e Jeferson",
-  "Gustavo",
-  "Dona Bia e Sr Antonio",
-  "Cleiton e Camile",
-  "Anônimo",
-];
 // -----------------
 
 export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProps) {
   const [open, setOpen] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { toast } = useToast();
+  
+  const firestore = useFirestore();
+  const guestsRef = useMemoFirebase(() => collection(firestore, 'couples', coupleId, 'guests'), [firestore]);
+  const { data: guests, isLoading: isLoadingGuests } = useCollection(guestsRef);
+
+  const guestList = guests ? [...guests.map(g => g.name), 'Anônimo'] : ['Anônimo'];
 
   const remainingAmount = gift.totalPrice - gift.contributedAmount;
 
@@ -92,12 +95,6 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
 
   function onSubmit(data: GiftFormValues) {
-    console.log("Gifting data (placeholder):", {
-        giftName: gift.name,
-        from: data.name,
-        ...data
-    });
-
     onConfirm(gift.id, data.amount);
     setIsConfirmed(true);
 
@@ -197,10 +194,10 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Seu nome</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Selecione seu nome da lista" />
+                                <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>

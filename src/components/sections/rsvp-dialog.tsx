@@ -32,6 +32,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { addDoc, collection } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { coupleId } from "@/lib/couple-data";
 
 const rsvpFormSchema = z.object({
   name: z.string({
@@ -41,26 +44,30 @@ const rsvpFormSchema = z.object({
 
 type RsvpFormValues = z.infer<typeof rsvpFormSchema>;
 
-const guestList = [
-  "Thaina e Jeferson",
-  "Gustavo",
-  "Dona Bia e Sr Antonio",
-  "Cleiton e Camile",
-];
-
 export default function RsvpDialog({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { toast } = useToast();
+  const firestore = useFirestore();
+
+  const guestsRef = useMemoFirebase(() => collection(firestore, 'couples', coupleId, 'guests'), [firestore]);
+  const { data: guests, isLoading: isLoadingGuests } = useCollection(guestsRef);
+
+  const guestList = guests ? guests.map(g => g.name) : [];
 
   const form = useForm<RsvpFormValues>({
     resolver: zodResolver(rsvpFormSchema),
   });
 
-  function onSubmit(data: RsvpFormValues) {
-    console.log("RSVP data:", data);
-    // Aqui você integraria com o backend para salvar a confirmação
+  async function onSubmit(data: RsvpFormValues) {
+    const rsvpsRef = collection(firestore, "couples", coupleId, "rsvps");
     
+    // Non-blocking write
+    addDoc(rsvpsRef, {
+      guestName: data.name,
+      confirmedAt: new Date(),
+    });
+
     setIsConfirmed(true);
 
     toast({
@@ -118,10 +125,10 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Seu nome</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione seu nome da lista" />
+                              <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -137,7 +144,7 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
                     )}
                   />
                   <DialogFooter>
-                    <Button type="submit" size="lg">
+                    <Button type="submit" size="lg" disabled={isLoadingGuests}>
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Confirmar
                     </Button>
