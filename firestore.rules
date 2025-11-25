@@ -25,7 +25,7 @@ service cloud.firestore {
 
       match /gifts/{giftId} {
         allow read: if true;
-        allow write: if isOwner(coupleId);
+        allow write: if isOwner(coupleId); // Allows create, update, delete for the owner
         // Allow anyone to update the contributed amount (for gift contribution)
         allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['contributedAmount']);
       }
