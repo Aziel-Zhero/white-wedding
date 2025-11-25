@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { collection, doc, updateDoc, arrayUnion } from "firebase/firestore";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError } from "@/firebase";
 import { coupleId } from "@/lib/couple-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Gift, CheckCircle, Loader2 } from "lucide-react";
@@ -19,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function GiftsPageSection() {
   const firestore = useFirestore();
 
-  const giftsRef = useMemoFirebase(() => collection(firestore, 'couples', coupleId, 'gifts'), [firestore]);
+  const giftsRef = useMemoFirebase(() => firestore ? collection(firestore, 'couples', coupleId, 'gifts') : null, [firestore]);
   const { data: gifts, isLoading: isLoadingGifts } = useCollection<GiftType>(giftsRef);
   
   const giftsWithImages = useMemo(() => {
@@ -31,17 +32,29 @@ export default function GiftsPageSection() {
   }, [gifts]);
 
   const handleConfirmGift = async (giftId: string, amount: number, contributorName: string) => {
-    if (!gifts) return;
+    if (!gifts || !firestore) return;
     const gift = gifts.find(g => g.id === giftId);
     if (!gift) return;
 
     const giftRef = doc(firestore, "couples", coupleId, "gifts", giftId);
     const newContributedAmount = (gift.contributedAmount || 0) + amount;
     
-    // Non-blocking update
-    updateDoc(giftRef, { 
-      contributedAmount: Math.min(newContributedAmount, gift.totalPrice),
-      contributors: arrayUnion({ name: contributorName, amount: amount })
+    const contributionData = {
+        contributedAmount: Math.min(newContributedAmount, gift.totalPrice),
+        contributors: arrayUnion({ name: contributorName, amount: amount })
+    };
+
+    updateDoc(giftRef, contributionData)
+    .catch(() => {
+        const permissionError = new FirestorePermissionError({
+            path: giftRef.path,
+            operation: 'update',
+            requestResourceData: { 
+                contributedAmount: gift.contributedAmount, 
+                contributors: gift.contributors 
+            },
+        });
+        errorEmitter.emit('permission-error', permissionError);
     });
   };
   
