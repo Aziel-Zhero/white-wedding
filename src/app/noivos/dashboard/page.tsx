@@ -214,7 +214,7 @@ export default function DashboardPage() {
     if (editingGuest) { // Update existing guest
         const guestDocRef = doc(firestore, "couples", coupleId, "guests", editingGuest.id);
         const updatedData = { name: guestName, email: guestEmail };
-        updateDoc(guestDocRef, updatedData)
+        updateDoc(guestDocRef)
             .then(() => {
                 toast({ title: "Convidado Atualizado!", description: `"${guestName}" foi atualizado com sucesso.` });
                 setIsGuestDialogOpen(false);
