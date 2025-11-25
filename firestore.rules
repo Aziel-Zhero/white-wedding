@@ -11,7 +11,7 @@ service cloud.firestore {
     function isOwner(coupleId) {
       // Ensure the document exists before trying to access its data
       let coupleDoc = get(/databases/$(database)/documents/couples/$(coupleId));
-      return isSignedIn() && coupleDoc.data.ownerId == request.auth.uid;
+      return isSignedIn() && exists(/databases/$(database)/documents/couples/$(coupleId)) && coupleDoc.data.ownerId == request.auth.uid;
     }
     
     function isNewGiftOwner() {
@@ -39,7 +39,7 @@ service cloud.firestore {
       }
       
       match /rsvps/{rsvpId} {
-        allow read: if isOwner(coupleId); 
+        allow read: if isSignedIn(); 
         allow create: if true; // Anyone can RSVP
       }
     }
