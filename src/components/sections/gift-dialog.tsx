@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, PartyPopper, ClipboardCopy, Gift } from "lucide-react";
+import { CheckCircle, PartyPopper, ClipboardCopy, Gift, Upload } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
 import { Separator } from "../ui/separator";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
@@ -75,6 +75,10 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
   const guestsRef = useMemoFirebase(() => collection(firestore, 'couples', coupleId, 'guests'), [firestore]);
   const { data: guests, isLoading: isLoadingGuests } = useCollection(guestsRef);
 
+  const [fileName, setFileName] = useState<string | null>(null);
+  const proofInputRef = useRef<HTMLInputElement>(null);
+
+
   const guestList = guests ? [...guests.map(g => g.name), 'Anônimo'] : ['Anônimo'];
 
   const remainingAmount = gift.totalPrice - gift.contributedAmount;
@@ -86,6 +90,9 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
       name: undefined,
     },
   });
+
+  const { ref: proofRef, ...proofRest } = form.register("proof");
+
 
   useEffect(() => {
     if (open) {
@@ -113,6 +120,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
         setTimeout(() => {
             setIsConfirmed(false);
             form.reset();
+            setFileName(null);
         }, 300);
     }
   }
@@ -145,7 +153,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
         ) : (
           <ScrollArea className="max-h-[90vh]">
             <div className="grid md:grid-cols-2">
-                <div className="flex flex-col p-6 bg-secondary/50 md:rounded-l-lg">
+                <div className="flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
                     {gift.image && (
                         <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border mx-auto">
                             <Image
@@ -228,20 +236,47 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                         )}
                         />
                         <FormField
-                        control={form.control}
-                        name="proof"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Comprovante (Opcional)</FormLabel>
-                            <FormControl>
-                                <Input type="file" {...form.register('proof')} />
-                            </FormControl>
-                            <FormDescription>
-                                Anexe o comprovante do PIX (print ou PDF).
-                            </FormDescription>
-                            <FormMessage />
-                            </FormItem>
-                        )}
+                            control={form.control}
+                            name="proof"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Comprovante (Opcional)</FormLabel>
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => proofInputRef.current?.click()}
+                                            >
+                                                <Upload className="mr-2 h-4 w-4" />
+                                                Escolher arquivo
+                                            </Button>
+                                            <span className="text-sm text-muted-foreground truncate">
+                                                {fileName || "Nenhum arquivo selecionado"}
+                                            </span>
+                                            <Input
+                                                type="file"
+                                                className="hidden"
+                                                {...proofRest}
+                                                ref={(e) => {
+                                                    proofRef(e);
+                                                    // @ts-ignore
+                                                    proofInputRef.current = e;
+                                                }}
+                                                onChange={(event) => {
+                                                    const file = event.target.files?.[0];
+                                                    setFileName(file ? file.name : null);
+                                                    field.onChange(file ? event.target.files : null);
+                                                }}
+                                            />
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription>
+                                        Anexe o comprovante do PIX (print ou PDF).
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
                         <DialogFooter className="!mt-6">
                         <Button type="submit" size="lg" className="w-full">
