@@ -98,7 +98,7 @@ export default function GiftsPageSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {isLoadingGifts ? renderSkeleton() : giftsWithImages.map((gift) => {
-            const progress = (gift.contributedAmount / gift.totalPrice) * 100;
+            const progress = (gift.totalPrice > 0) ? (gift.contributedAmount / gift.totalPrice) * 100 : 100;
             const remaining = gift.totalPrice - gift.contributedAmount;
             const isGifted = remaining <= 0;
             const isPartiallyGifted = gift.contributedAmount > 0 && !isGifted;
@@ -111,15 +111,19 @@ export default function GiftsPageSection() {
                   isGifted && "opacity-60"
                 )}
               >
-                <div className="aspect-square relative">
-                    {gift.image && (
+                <div className="aspect-square w-full relative overflow-hidden">
+                    {gift.image ? (
                         <Image
                         src={gift.image.imageUrl}
                         alt={gift.name}
                         fill
-                        className="object-cover"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                         data-ai-hint={gift.image.imageHint}
                         />
+                    ) : (
+                      <div className="w-full h-full bg-secondary flex items-center justify-center">
+                        <Gift className="w-12 h-12 text-muted-foreground" />
+                      </div>
                     )}
                     {isGifted && (
                         <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center">
@@ -168,3 +172,4 @@ export default function GiftsPageSection() {
     </section>
   );
 }
+
