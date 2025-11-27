@@ -66,7 +66,7 @@ export default function GiftsPageSection() {
      Array.from({ length: count }).map((_, index) => (
         <Card key={index} className="overflow-hidden shadow-lg flex flex-col rounded-lg">
           <div className="flex-shrink-0">
-             <Skeleton className="aspect-square w-full" />
+             <Skeleton className="h-48 w-full" />
           </div>
           <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
              <Skeleton className="h-6 w-3/4 mb-2" />
@@ -113,7 +113,7 @@ export default function GiftsPageSection() {
                   isGifted && "opacity-60"
                 )}
               >
-                <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden">
+                <div className="relative h-48 w-full flex-shrink-0 overflow-hidden">
                     {gift.image ? (
                         <Image
                         src={gift.image.imageUrl}
