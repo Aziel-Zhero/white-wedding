@@ -65,12 +65,14 @@ export default function GiftsPageSection() {
   const renderSkeleton = (count = 8) => (
      Array.from({ length: count }).map((_, index) => (
         <Card key={index} className="overflow-hidden shadow-lg flex flex-col rounded-lg">
-          <Skeleton className="aspect-square w-full" />
+          <div className="flex-shrink-0">
+             <Skeleton className="aspect-square w-full" />
+          </div>
           <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
              <Skeleton className="h-6 w-3/4 mb-2" />
              <Skeleton className="h-4 w-full mb-1" />
              <Skeleton className="h-4 w-5/6 mb-4" />
-             <div className="mt-auto">
+             <div className="mt-auto pt-4">
                 <div className="flex justify-between items-end mb-1">
                   <Skeleton className="h-4 w-1/2" />
                 </div>
@@ -107,11 +109,11 @@ export default function GiftsPageSection() {
               <Card 
                 key={gift.id} 
                 className={cn(
-                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg",
+                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg group",
                   isGifted && "opacity-60"
                 )}
               >
-                <div className="aspect-square w-full relative overflow-hidden">
+                <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden">
                     {gift.image ? (
                         <Image
                         src={gift.image.imageUrl}
@@ -143,7 +145,7 @@ export default function GiftsPageSection() {
                   <h3 className="text-xl font-bold font-headline">{gift.name}</h3>
                   <p className="mt-2 text-muted-foreground text-sm flex-grow">{gift.description}</p>
                   
-                  <div className="mt-4">
+                  <div className="mt-auto pt-4">
                     <div className="flex justify-between items-end mb-1">
                       <span className="text-xs text-muted-foreground">
                         {formatCurrency(gift.contributedAmount)} / {formatCurrency(gift.totalPrice)}
@@ -155,13 +157,13 @@ export default function GiftsPageSection() {
                        )}
                     </div>
                     <Progress value={progress} className="h-2" />
+                    
+                    <GiftDialog gift={gift} onConfirm={handleConfirmGift}>
+                      <Button className="mt-4 w-full" disabled={isGifted}>
+                        {isGifted ? "Obrigado!" : (isPartiallyGifted ? "Contribuir na vaquinha!" : "Presentear")}
+                      </Button>
+                    </GiftDialog>
                   </div>
-
-                  <GiftDialog gift={gift} onConfirm={handleConfirmGift}>
-                    <Button className="mt-4 w-full" disabled={isGifted}>
-                      {isGifted ? "Obrigado!" : (isPartiallyGifted ? "Contribuir na vaquinha!" : "Presentear")}
-                    </Button>
-                  </GiftDialog>
 
                 </CardContent>
               </Card>
@@ -172,4 +174,3 @@ export default function GiftsPageSection() {
     </section>
   );
 }
-
