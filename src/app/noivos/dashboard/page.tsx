@@ -14,6 +14,7 @@ import {
   Trash2,
   Edit,
   Package,
+  Hash,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -375,6 +376,20 @@ export default function DashboardPage() {
     ))
   );
 
+  const renderGiftSkeleton = (rows = 5) => (
+    Array.from({ length: rows }).map((_, index) => (
+      <TableRow key={index}>
+        <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+        <TableCell className="hidden sm:table-cell"><Skeleton className="h-16 w-16" /></TableCell>
+        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+      </TableRow>
+    ))
+  );
+
+
   return (
     <TooltipProvider>
       <Tabs defaultValue="convidados" className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -682,6 +697,19 @@ export default function DashboardPage() {
                       )}
                     </CardContent>
                   </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Total de Itens</CardTitle>
+                      <Gift className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      {isLoadingGifts ? <Skeleton className="h-8 w-16 mt-1" /> : (
+                        <div className="text-2xl font-bold">
+                          {gifts?.length ?? 0}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                   <h2 className="text-xl font-headline font-bold flex items-center gap-2">
@@ -744,6 +772,7 @@ export default function DashboardPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
+                            <TableHead className="w-[50px]">#</TableHead>
                             <TableHead className="w-[80px] hidden sm:table-cell">Imagem</TableHead>
                             <TableHead>Produto</TableHead>
                             <TableHead>Preço</TableHead>
@@ -752,8 +781,9 @@ export default function DashboardPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {isLoadingGifts ? renderSkeleton(5) : giftsWithContributors.map((gift) => (
+                          {isLoadingGifts ? renderGiftSkeleton(5) : giftsWithContributors.map((gift, index) => (
                             <TableRow key={gift.id}>
+                               <TableCell className="font-medium">{index + 1}</TableCell>
                               <TableCell className="hidden sm:table-cell">
                                 {gift.image ? (
                                   <Image
@@ -862,4 +892,6 @@ export default function DashboardPage() {
 
     
     
+    
+
     
