@@ -13,6 +13,7 @@ import {
   Loader2,
   Trash2,
   Edit,
+  Package,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -172,6 +173,10 @@ export default function DashboardPage() {
   
   const totalGiftValue = useMemo(() => {
     return gifts?.reduce((acc, gift) => acc + (gift.contributedAmount || 0), 0) ?? 0;
+  }, [gifts]);
+
+  const totalGiftListPrice = useMemo(() => {
+    return gifts?.reduce((acc, gift) => acc + gift.totalPrice, 0) ?? 0;
   }, [gifts]);
   
   const receivedGifts = useMemo(() => {
@@ -660,6 +665,24 @@ export default function DashboardPage() {
               </TabsContent>
 
               <TabsContent value="gerenciar" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                   <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium">Valor Total da Lista</CardTitle>
+                      <Package className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      {isLoadingGifts ? <Skeleton className="h-8 w-32 mt-1" /> : (
+                        <div className="text-2xl font-bold">
+                          {totalGiftListPrice.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                   <h2 className="text-xl font-headline font-bold flex items-center gap-2">
                     <ListPlus /> Itens da sua Lista
@@ -837,5 +860,6 @@ export default function DashboardPage() {
 
 }
 
+    
     
     
