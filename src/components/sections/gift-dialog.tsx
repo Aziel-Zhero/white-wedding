@@ -65,7 +65,7 @@ const giftFormSchema = z.object({
       invalid_type_error: "Por favor, insira um número válido.",
     })
     .positive("O valor deve ser maior que zero."),
-  proof: z.any().optional(),
+  proof: z.any().refine((files) => files?.length > 0, "O comprovante é obrigatório."),
 }).refine(data => {
     if (data.identification === 'yes' && !data.name) {
         return false;
@@ -329,7 +329,7 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                             name="proof"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Comprovante (Opcional)</FormLabel>
+                                    <FormLabel>Comprovante</FormLabel>
                                     <div className="flex items-center gap-2">
                                        <Button
                                             type="button"
