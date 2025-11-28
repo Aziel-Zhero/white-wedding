@@ -50,7 +50,7 @@ interface GiftDialogProps {
 }
 
 const giftFormSchema = z.object({
-  name: z.string({ required_error: "Por favor, selecione seu nome." }),
+  name: z.string({ required_error: "Por favor, selecione seu nome ou a opção anônima." }),
   amount: z.coerce
     .number({
       required_error: "Por favor, insira um valor.",
@@ -107,7 +107,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
     toast({
         title: "Contribuição enviada!",
-        description: `Obrigado, ${data.name}, por presentear com R$ ${data.amount.toFixed(2)} para "${gift.name}"!`,
+        description: `Obrigado por seu presente para "${gift.name}"!`,
         duration: 5000,
     });
   }
@@ -218,6 +218,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                                 </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
+                                  <SelectItem value="Anônimo">Contribuir anonimamente</SelectItem>
                                 {guestList.map((guest) => (
                                     <SelectItem key={guest} value={guest}>
                                     {guest}
