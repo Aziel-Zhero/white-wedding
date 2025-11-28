@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -16,6 +17,7 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import RsvpDialog from "../sections/rsvp-dialog";
@@ -66,6 +68,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right">
               <SheetHeader>
+                <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
                 <Link
                   href="/#inicio"
                   className="flex items-center gap-2 mb-4"
