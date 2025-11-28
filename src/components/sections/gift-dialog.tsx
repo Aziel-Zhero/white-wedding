@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -15,6 +16,16 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,7 +45,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, PartyPopper, ClipboardCopy, Gift, Upload, Info } from "lucide-react";
+import { CheckCircle, PartyPopper, ClipboardCopy, Gift, Upload, Info, Heart } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
 import { Separator } from "../ui/separator";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
@@ -56,13 +67,11 @@ const giftFormSchema = z.object({
     .positive("O valor deve ser maior que zero."),
   proof: z.any().optional(),
 }).refine(data => {
-    // If identification is 'yes', then a name must be selected.
     if (data.identification === 'yes' && !data.name) {
         return false;
     }
     return true;
 }, {
-    // Custom error message for the name field when identification is 'yes'.
     message: "Por favor, selecione seu nome da lista.",
     path: ["name"],
 });
@@ -223,14 +232,27 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                                 <FormItem className="space-y-3">
                                     <div className="flex items-center gap-2">
                                         <FormLabel>Gostaria de deixar seu nome para Agradecimento?</FormLabel>
-                                        <Tooltip delayDuration={100}>
-                                            <TooltipTrigger type="button">
-                                                <Info className="h-4 w-4 text-muted-foreground" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>Seu nome nos ajuda a agradecer pessoalmente seu carinho!</p>
-                                            </TooltipContent>
-                                        </Tooltip>
+                                         <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <button type="button">
+                                                    <Info className="h-4 w-4 text-muted-foreground hover:text-primary cursor-pointer" />
+                                                </button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <div className="flex justify-center mb-2">
+                                                      <Heart className="h-10 w-10 text-primary" />
+                                                    </div>
+                                                    <AlertDialogTitle className="text-center font-headline text-xl">Uma Mensagem de Carinho</AlertDialogTitle>
+                                                    <AlertDialogDescription className="text-center text-base pt-2">
+                                                        Amamos e respeitamos sua decisão de presentear anonimamente. O mais importante para nós é o seu carinho e a sua presença. Ficaremos imensamente felizes de qualquer forma! Com amor, os noivos.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogAction>Entendido!</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </div>
                                     <FormControl>
                                         <RadioGroup
