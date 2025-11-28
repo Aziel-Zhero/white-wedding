@@ -54,7 +54,7 @@ export default function GiftsInfoDialog() {
                     <Users className="h-5 w-5 mt-1 text-primary flex-shrink-0" />
                     <div>
                         <h4 className="font-semibold text-foreground">Vaquinha Virtual</h4>
-                        <p>Itens mais caros podem ser divididos. Sinta-se à vontade para contribuir com qualquer valor para nos ajudar a alcançá-los!</p>
+                        <p>Você pode nos presentear com o item completo ou contribuir com qualquer valor para nos ajudar a comprá-lo. Caso contribua com uma parte, o restante ficará disponível para que outras pessoas também possam nos ajudar. Ficaremos felizes de toda maneira!</p>
                     </div>
                 </div>
                 <div className="flex items-start gap-3">
