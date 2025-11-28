@@ -114,7 +114,7 @@ export default function GiftsPageSection() {
                 )}
               >
                 <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
-                    <div className="relative w-full aspect-square rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-full aspect-video rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
                       {gift.image ? (
                           <Image
                           src={gift.image.imageUrl}
