@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Church, Glasses } from "lucide-react";
+import { Church, Wine } from "lucide-react";
 import Countdown from "./countdown";
 
 export default function DetailsSection() {
@@ -38,7 +38,7 @@ export default function DetailsSection() {
           <Card className="text-center shadow-xl transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
               <div className="mx-auto bg-primary/20 p-4 rounded-full w-fit">
-                <Glasses className="h-10 w-10 text-primary" />
+                <Wine className="h-10 w-10 text-primary" />
               </div>
               <CardTitle className="font-headline text-3xl mt-4">Recepção</CardTitle>
             </CardHeader>
