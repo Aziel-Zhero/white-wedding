@@ -35,10 +35,6 @@ export default function GiftsInfoDialog() {
   const handleClose = () => {
     setIsOpen(false);
   };
-  
-  if (typeof window === 'undefined') {
-    return null;
-  }
 
   return (
     <AlertDialog open={isOpen} onOpenChange={handleClose}>
