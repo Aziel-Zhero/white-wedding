@@ -93,7 +93,7 @@ export default function Header() {
                   </Link>
                 ))}
                 <RsvpDialog>
-                   <Button size="lg" className="mt-4 w-full" onClick={() => setSheetOpen(false)}>Confirmar Presença</Button>
+                   <Button size="lg" className="mt-4 w-full">Confirmar Presença</Button>
                 </RsvpDialog>
               </nav>
             </SheetContent>
