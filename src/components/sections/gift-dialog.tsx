@@ -34,23 +34,20 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, PartyPopper, ClipboardCopy, Gift, Upload } from "lucide-react";
+import { CheckCircle, PartyPopper, ClipboardCopy, Gift, Upload, Info } from "lucide-react";
 import type { Gift as GiftType } from "@/lib/gifts-data";
 import { Separator } from "../ui/separator";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import { coupleId } from "@/lib/couple-data";
 import { ScrollArea } from "../ui/scroll-area";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
-
-interface GiftDialogProps {
-  gift: GiftType;
-  onConfirm: (giftId: string, amount: number, contributorName: string) => void;
-  children: React.ReactNode;
-}
 
 const giftFormSchema = z.object({
-  name: z.string({ required_error: "Por favor, selecione seu nome ou a opção anônima." }),
+  identification: z.enum(["yes", "no"], { required_error: "Por favor, selecione uma opção." }),
+  name: z.string().optional(),
   amount: z.coerce
     .number({
       required_error: "Por favor, insira um valor.",
@@ -58,6 +55,16 @@ const giftFormSchema = z.object({
     })
     .positive("O valor deve ser maior que zero."),
   proof: z.any().optional(),
+}).refine(data => {
+    // If identification is 'yes', then a name must be selected.
+    if (data.identification === 'yes' && !data.name) {
+        return false;
+    }
+    return true;
+}, {
+    // Custom error message for the name field when identification is 'yes'.
+    message: "Por favor, selecione seu nome da lista.",
+    path: ["name"],
 });
 
 type GiftFormValues = z.infer<typeof giftFormSchema>;
@@ -65,7 +72,7 @@ type GiftFormValues = z.infer<typeof giftFormSchema>;
 const pixKey = "00020126440014br.gov.bcb.pix0122aziel_1994@hotmail.com5204000053039865802BR5924AZIELASAFFEOLIVEIRAPAULA6009Sao Paulo610901227-20062230519daqr22254342532843163048626";
 const qrCodeImage = "/qrcode.jpeg";
 
-export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProps) {
+export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftType, onConfirm: (giftId: string, amount: number, contributorName: string) => void, children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { toast } = useToast();
@@ -86,11 +93,12 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
     resolver: zodResolver(giftFormSchema),
     defaultValues: {
       amount: undefined,
-      name: undefined,
+      identification: "yes",
     },
   });
 
   const { ref: proofRef, ...proofRest } = form.register("proof");
+  const showNameSelection = form.watch("identification");
 
 
   useEffect(() => {
@@ -102,7 +110,8 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
 
   function onSubmit(data: GiftFormValues) {
-    onConfirm(gift.id, data.amount, data.name);
+    const contributorName = data.identification === 'yes' ? data.name! : "Anônimo";
+    onConfirm(gift.id, data.amount, contributorName);
     setIsConfirmed(true);
 
     toast({
@@ -117,7 +126,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
     if (!isOpen) {
         setTimeout(() => {
             setIsConfirmed(false);
-            form.reset();
+            form.reset({ identification: 'yes' });
             setFileName(null);
         }, 300);
     }
@@ -150,6 +159,7 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
            </div>
         ) : (
           <ScrollArea className="max-h-[90vh]">
+          <TooltipProvider>
             <div className="grid md:grid-cols-2">
                 <div className="relative flex flex-col p-6 bg-secondary/50 rounded-t-lg md:rounded-l-lg md:rounded-t-none">
                      <div className="text-left mb-4">
@@ -205,31 +215,80 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
 
                     <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-auto">
-                        <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Seu nome (para o agradecimento)</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Anônimo">Contribuir anonimamente</SelectItem>
-                                {guestList.map((guest) => (
-                                    <SelectItem key={guest} value={guest}>
-                                    {guest}
-                                    </SelectItem>
-                                ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                            </FormItem>
-                        )}
+                        
+                         <FormField
+                            control={form.control}
+                            name="identification"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <FormLabel>Gostaria de deixar seu nome para Agradecimento?</FormLabel>
+                                        <Tooltip delayDuration={100}>
+                                            <TooltipTrigger type="button">
+                                                <Info className="h-4 w-4 text-muted-foreground" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Seu nome nos ajuda a agradecer pessoalmente seu carinho!</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </div>
+                                    <FormControl>
+                                        <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className="flex flex-col space-y-1"
+                                        >
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value="yes" />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
+                                                Sim, quero me identificar
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value="no" />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
+                                                Não, presentear anonimamente
+                                            </FormLabel>
+                                        </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
+
+                        {showNameSelection === 'yes' && (
+                            <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Seu nome (para o agradecimento)</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {guestList.map((guest) => (
+                                        <SelectItem key={guest} value={guest}>
+                                        {guest}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                        )}
+
+
                         <FormField
                         control={form.control}
                         name="amount"
@@ -294,9 +353,12 @@ export default function GiftDialog({ gift, onConfirm, children }: GiftDialogProp
                     </Form>
                 </div>
             </div>
+            </TooltipProvider>
           </ScrollArea>
         )}
       </DialogContent>
     </Dialog>
   );
 }
+
+    
