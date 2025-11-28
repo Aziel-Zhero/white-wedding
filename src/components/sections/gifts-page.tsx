@@ -113,35 +113,36 @@ export default function GiftsPageSection() {
                   isGifted && "opacity-60"
                 )}
               >
-                <div className="relative h-48 w-full flex-shrink-0 overflow-hidden">
-                    {gift.image ? (
-                        <Image
-                        src={gift.image.imageUrl}
-                        alt={gift.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        data-ai-hint={gift.image.imageHint}
-                        />
-                    ) : (
-                      <div className="w-full h-full bg-secondary flex items-center justify-center">
-                        <Gift className="w-12 h-12 text-muted-foreground" />
-                      </div>
-                    )}
-                    {isGifted && (
-                        <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center">
-                            <div className="text-center text-secondary-foreground p-4 rounded-lg">
-                               <CheckCircle className="h-12 w-12 mx-auto text-primary" />
-                               <p className="font-bold text-xl mt-2 font-headline">Presenteado!</p>
-                            </div>
+                <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
+                    <div className="relative w-full aspect-square rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
+                      {gift.image ? (
+                          <Image
+                          src={gift.image.imageUrl}
+                          alt={gift.name}
+                          fill
+                          className="object-cover"
+                          data-ai-hint={gift.image.imageHint}
+                          />
+                      ) : (
+                        <div className="w-full h-full bg-secondary flex items-center justify-center">
+                          <Gift className="w-12 h-12 text-muted-foreground" />
                         </div>
-                    )}
-                    {isPartiallyGifted && (
+                      )}
+                      {isGifted && (
+                          <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center">
+                              <div className="text-center text-secondary-foreground p-4 rounded-lg">
+                                <CheckCircle className="h-12 w-12 mx-auto text-primary" />
+                                <p className="font-bold text-xl mt-2 font-headline">Presenteado!</p>
+                              </div>
+                          </div>
+                      )}
+                       {isPartiallyGifted && !isGifted && (
                         <div className="absolute top-0 left-0 right-0 bg-destructive/90 text-destructive-foreground text-center py-1 font-bold text-sm animate-pulse">
                             Ajude os noivos!
                         </div>
                     )}
-                </div>
-                <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
+                    </div>
+                  
                   <h3 className="text-xl font-bold font-headline">{gift.name}</h3>
                   <p className="mt-2 text-muted-foreground text-sm flex-grow">{gift.description}</p>
                   
