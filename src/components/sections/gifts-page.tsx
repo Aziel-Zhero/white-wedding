@@ -98,7 +98,7 @@ export default function GiftsPageSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {isLoadingGifts ? renderSkeleton() : giftsWithImages.map((gift) => {
             const progress = (gift.totalPrice > 0) ? (gift.contributedAmount / gift.totalPrice) * 100 : 100;
             const remaining = gift.totalPrice - gift.contributedAmount;
@@ -109,11 +109,11 @@ export default function GiftsPageSection() {
               <Card 
                 key={gift.id} 
                 className={cn(
-                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg group",
+                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg group h-[450px]", // Altura fixa para o card
                   isGifted && "opacity-60"
                 )}
               >
-                <CardContent className="p-4 md:p-6 flex flex-col flex-grow">
+                <CardContent className="p-4 flex flex-col flex-grow">
                     <div className="relative h-48 w-full rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
                       {gift.image ? (
                           <Image
@@ -144,7 +144,7 @@ export default function GiftsPageSection() {
                     </div>
                   
                   <h3 className="text-xl font-bold font-headline">{gift.name}</h3>
-                  <p className="mt-2 text-muted-foreground text-sm flex-grow">{gift.description}</p>
+                  <p className="mt-2 text-muted-foreground text-sm flex-grow overflow-y-auto">{gift.description}</p>
                   
                   <div className="mt-auto pt-4">
                     <div className="flex justify-between items-end mb-1">
