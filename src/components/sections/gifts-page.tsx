@@ -114,13 +114,13 @@ export default function GiftsPageSection() {
                 )}
               >
                 <CardContent className="p-4 flex flex-col flex-grow">
-                    <div className="relative w-full aspect-[4/3] rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-full aspect-[3/2] rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
                       {gift.image ? (
                           <Image
                           src={gift.image.imageUrl}
                           alt={gift.name}
                           fill
-                          className="object-cover"
+                          className="object-contain p-2"
                           data-ai-hint={gift.image.imageHint}
                           />
                       ) : (
