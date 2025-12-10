@@ -109,12 +109,12 @@ export default function GiftsPageSection() {
               <Card 
                 key={gift.id} 
                 className={cn(
-                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg group h-[450px]", // Altura fixa para o card
+                  "overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col rounded-lg group",
                   isGifted && "opacity-60"
                 )}
               >
                 <CardContent className="p-4 flex flex-col flex-grow">
-                    <div className="relative h-48 w-full rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-full aspect-[4/3] rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
                       {gift.image ? (
                           <Image
                           src={gift.image.imageUrl}
