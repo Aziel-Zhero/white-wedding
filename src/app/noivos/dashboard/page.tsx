@@ -27,6 +27,10 @@ import {
   updateDoc,
   getDoc,
   setDoc,
+  query,
+  where,
+  getDocs,
+  writeBatch,
 } from "firebase/firestore";
 import { useAuth, useFirestore, useCollection, useMemoFirebase, errorEmitter, FirestorePermissionError, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -97,6 +101,11 @@ type GuestType = {
   email?: string;
 };
 
+type RsvpType = {
+  id: string;
+  guestName: string;
+}
+
 export default function DashboardPage() {
   const firestore = useFirestore();
   const auth = useAuth();
@@ -129,7 +138,7 @@ export default function DashboardPage() {
 
   const { data: allGuests, isLoading: isLoadingGuests } = useCollection<GuestType>(guestsRef);
   const { data: gifts, isLoading: isLoadingGifts } = useCollection<GiftType>(giftsRef);
-  const { data: rsvps, isLoading: isLoadingRsvps } = useCollection(rsvpsRef);
+  const { data: rsvps, isLoading: isLoadingRsvps } = useCollection<RsvpType>(rsvpsRef);
   
   // Ensure couple document exists
   useEffect(() => {
@@ -155,7 +164,14 @@ export default function DashboardPage() {
   }, [user, firestore]);
 
   // --- Computed Data ---
-  const confirmedGuests = useMemo(() => rsvps?.map(r => ({...r, status: 'Confirmado'})) ?? [], [rsvps]);
+  const confirmedGuests = useMemo(() => {
+    if (!rsvps || !allGuests) return [];
+    const existingGuestNames = new Set(allGuests.map(g => g.name));
+    // Filter RSVPs to only include guests that still exist
+    return rsvps
+      .filter(r => existingGuestNames.has(r.guestName))
+      .map(r => ({...r, status: 'Confirmado'}));
+  }, [rsvps, allGuests]);
   
   const pendingGuests = useMemo(() => {
     if (!allGuests || !rsvps) return [];
@@ -249,23 +265,41 @@ export default function DashboardPage() {
 };
 
   const handleDeleteGuest = async (guestId: string, guestName: string) => {
-    if (!firestore) return;
+    if (!firestore || !rsvpsRef) return;
     const guestDocRef = doc(firestore, "couples", coupleId, "guests", guestId);
-    deleteDoc(guestDocRef)
-      .then(() => {
+    
+    try {
+        // Start a batch write
+        const batch = writeBatch(firestore);
+
+        // 1. Delete the guest document
+        batch.delete(guestDocRef);
+
+        // 2. Find and delete the corresponding RSVP document
+        const rsvpQuery = query(rsvpsRef, where("guestName", "==", guestName));
+        const rsvpQuerySnapshot = await getDocs(rsvpQuery);
+        rsvpQuerySnapshot.forEach((rsvpDoc) => {
+            batch.delete(rsvpDoc.ref);
+        });
+
+        // 3. Commit the batch
+        await batch.commit();
+        
         toast({
           title: "Convidado Removido",
-          description: `"${guestName}" foi removido da sua lista.`,
+          description: `"${guestName}" e sua confirmação de presença foram removidos.`,
         });
-      })
-      .catch((error) => {
+
+    } catch (error) {
+        console.error("Error removing guest and RSVP:", error);
+        // Fallback to emitting a single error for the primary failed action
         const permissionError = new FirestorePermissionError({
           path: guestDocRef.path,
           operation: 'delete',
         });
         errorEmitter.emit('permission-error', permissionError);
-      });
-  };
+    }
+};
 
   // --- Gift Management ---
   const openAddGiftDialog = () => {
@@ -889,3 +923,5 @@ export default function DashboardPage() {
   );
 
 }
+
+    
