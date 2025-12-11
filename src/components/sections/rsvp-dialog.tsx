@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, useMemo } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,7 +33,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, PartyPopper } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { coupleId } from "@/lib/couple-data";
 
@@ -44,26 +45,63 @@ const rsvpFormSchema = z.object({
 
 type RsvpFormValues = z.infer<typeof rsvpFormSchema>;
 
+type Guest = {
+  id: string;
+  name: string;
+}
+
+type Rsvp = {
+  id: string;
+  guestName: string;
+}
+
+
 export default function RsvpDialog({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { toast } = useToast();
   const firestore = useFirestore();
 
-  const guestsRef = useMemoFirebase(() => collection(firestore, 'couples', coupleId, 'guests'), [firestore]);
-  const { data: guests, isLoading: isLoadingGuests } = useCollection(guestsRef);
+  const guestsRef = useMemoFirebase(() => firestore ? collection(firestore, 'couples', coupleId, 'guests') : null, [firestore]);
+  const rsvpsRef = useMemoFirebase(() => firestore ? collection(firestore, 'couples', coupleId, 'rsvps') : null, [firestore]);
 
-  const guestList = guests ? guests.map(g => g.name) : [];
+  const { data: guests, isLoading: isLoadingGuests } = useCollection<Guest>(guestsRef);
+  const { data: rsvps, isLoading: isLoadingRsvps } = useCollection<Rsvp>(rsvpsRef);
+
+  const availableGuests = useMemo(() => {
+    if (!guests || !rsvps) {
+      return guests || [];
+    }
+    const confirmedGuestNames = new Set(rsvps.map(r => r.guestName));
+    return guests.filter(g => !confirmedGuestNames.has(g.name));
+  }, [guests, rsvps]);
+  
+  const guestList = availableGuests ? availableGuests.map(g => g.name) : [];
+  const isLoading = isLoadingGuests || isLoadingRsvps;
+
 
   const form = useForm<RsvpFormValues>({
     resolver: zodResolver(rsvpFormSchema),
   });
 
   async function onSubmit(data: RsvpFormValues) {
-    const rsvpsRef = collection(firestore, "couples", coupleId, "rsvps");
+    if (!firestore) return;
+    const rsvpsCollectionRef = collection(firestore, "couples", coupleId, "rsvps");
     
-    // Non-blocking write
-    addDoc(rsvpsRef, {
+    // Prevent duplicate RSVPs
+    const q = query(rsvpsCollectionRef, where("guestName", "==", data.name));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        toast({
+            variant: "destructive",
+            title: "Presença já confirmada",
+            description: "Você já confirmou sua presença anteriormente.",
+        });
+        return;
+    }
+
+    addDoc(rsvpsCollectionRef, {
       guestName: data.name,
       confirmedAt: new Date(),
     });
@@ -125,18 +163,24 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Seu nome</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingGuests}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={isLoadingGuests ? "Carregando..." : "Selecione seu nome da lista"} />
+                              <SelectValue placeholder={isLoading ? "Carregando..." : "Selecione seu nome da lista"} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {guestList.map((guest) => (
-                              <SelectItem key={guest} value={guest}>
-                                {guest}
+                             {guestList.length > 0 ? (
+                              guestList.map((guest) => (
+                                <SelectItem key={guest} value={guest}>
+                                  {guest}
+                                </SelectItem>
+                              ))
+                            ) : (
+                               <SelectItem value="no-guests" disabled>
+                                {isLoading ? "Carregando lista..." : "Nenhum convidado pendente"}
                               </SelectItem>
-                            ))}
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -144,7 +188,7 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
                     )}
                   />
                   <DialogFooter>
-                    <Button type="submit" size="lg" disabled={isLoadingGuests}>
+                    <Button type="submit" size="lg" disabled={isLoading}>
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Confirmar
                     </Button>
