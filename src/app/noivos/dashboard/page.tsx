@@ -791,7 +791,7 @@ export default function DashboardPage() {
                                     alt={gift.name}
                                     width={64}
                                     height={64}
-                                    className="rounded-md object-cover aspect-square"
+                                    className="rounded-md object-contain aspect-square"
                                   />
                                 ) : <Skeleton className="h-16 w-16 rounded-md" /> }
                               </TableCell>
