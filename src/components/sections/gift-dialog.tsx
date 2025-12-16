@@ -181,7 +181,7 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                     </div>
 
                     {gift.image && (
-                        <div className="relative w-full aspect-[3/2] rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
+                        <div className="relative w-full aspect-[3/2] rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md bg-white">
                             <Image
                                 src={gift.image.imageUrl}
                                 alt={gift.name}
@@ -384,5 +384,3 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
     </Dialog>
   );
 }
-
-    
