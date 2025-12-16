@@ -297,11 +297,13 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                    {guestList.map((guest) => (
-                                        <SelectItem key={guest} value={guest}>
-                                        {guest}
-                                        </SelectItem>
-                                    ))}
+                                      <ScrollArea className="h-72">
+                                        {guestList.map((guest) => (
+                                            <SelectItem key={guest} value={guest}>
+                                            {guest}
+                                            </SelectItem>
+                                        ))}
+                                      </ScrollArea>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />

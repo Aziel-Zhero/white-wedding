@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, type ReactNode, useMemo } from "react";
@@ -170,17 +171,19 @@ export default function RsvpDialog({ children }: { children: ReactNode }) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                             {guestList.length > 0 ? (
-                              guestList.map((guest) => (
-                                <SelectItem key={guest} value={guest}>
-                                  {guest}
+                            <ScrollArea className="h-72">
+                               {guestList.length > 0 ? (
+                                guestList.map((guest) => (
+                                  <SelectItem key={guest} value={guest}>
+                                    {guest}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                 <SelectItem value="no-guests" disabled>
+                                  {isLoading ? "Carregando lista..." : "Nenhum convidado pendente"}
                                 </SelectItem>
-                              ))
-                            ) : (
-                               <SelectItem value="no-guests" disabled>
-                                {isLoading ? "Carregando lista..." : "Nenhum convidado pendente"}
-                              </SelectItem>
-                            )}
+                              )}
+                            </ScrollArea>
                           </SelectContent>
                         </Select>
                         <FormMessage />
