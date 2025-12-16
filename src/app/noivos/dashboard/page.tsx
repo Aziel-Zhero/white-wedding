@@ -14,11 +14,13 @@ import {
   Trash2,
   Edit,
   Package,
-  Hash,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   addDoc,
   collection,
@@ -78,7 +80,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,6 +94,7 @@ import { type Gift as GiftType, type Contributor } from "@/lib/gifts-data";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 
 type GuestType = {
@@ -106,6 +108,15 @@ type RsvpType = {
   guestName: string;
 }
 
+const giftFormSchema = z.object({
+  name: z.string().min(1, "O nome é obrigatório."),
+  description: z.string().optional(),
+  price: z.coerce.number().positive("O preço deve ser um número positivo."),
+  imageUrl: z.string().url("URL da imagem inválida.").optional().or(z.literal('')),
+});
+
+type GiftFormValues = z.infer<typeof giftFormSchema>;
+
 export default function DashboardPage() {
   const firestore = useFirestore();
   const auth = useAuth();
@@ -113,23 +124,30 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const { user } = useUser();
 
-  // --- Form State for New/Edit Gift ---
+  // --- Dialog State ---
   const [isGiftDialogOpen, setIsGiftDialogOpen] = useState(false);
-  const [isSavingGift, setIsSavingGift] = useState(false);
-  const [editingGift, setEditingGift] = useState<GiftType | null>(null);
-  const [giftName, setGiftName] = useState("");
-  const [giftDescription, setGiftDescription] = useState("");
-  const [giftPrice, setGiftPrice] = useState("");
-  const [giftImageUrl, setGiftImageUrl] = useState("");
-
-
-  // --- Form State for New/Edit Guest ---
   const [isGuestDialogOpen, setIsGuestDialogOpen] = useState(false);
+  
+  // --- Loading/Saving State ---
   const [isSavingGuest, setIsSavingGuest] = useState(false);
+  
+  // --- Editing State ---
+  const [editingGift, setEditingGift] = useState<GiftType | null>(null);
   const [editingGuest, setEditingGuest] = useState<GuestType | null>(null);
+
+  // --- Form State ---
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
-
+  
+  const giftForm = useForm<GiftFormValues>({
+    resolver: zodResolver(giftFormSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      price: undefined,
+      imageUrl: "",
+    },
+  });
 
   // --- Firebase Data ---
   const guestsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "guests") : null, [firestore]);
@@ -239,7 +257,7 @@ export default function DashboardPage() {
     if (editingGuest) { // Update existing guest
         const guestDocRef = doc(firestore, "couples", coupleId, "guests", editingGuest.id);
         const updatedData = { name: guestName, email: guestEmail };
-        updateDoc(guestDocRef, updatedData)
+        updateDoc(guestDocRef)
             .then(() => {
                 toast({ title: "Convidado Atualizado!", description: `"${guestName}" foi atualizado com sucesso.` });
                 setIsGuestDialogOpen(false);
@@ -269,20 +287,15 @@ export default function DashboardPage() {
     const guestDocRef = doc(firestore, "couples", coupleId, "guests", guestId);
     
     try {
-        // Start a batch write
         const batch = writeBatch(firestore);
-
-        // 1. Delete the guest document
         batch.delete(guestDocRef);
 
-        // 2. Find and delete the corresponding RSVP document
         const rsvpQuery = query(rsvpsRef, where("guestName", "==", guestName));
         const rsvpQuerySnapshot = await getDocs(rsvpQuery);
         rsvpQuerySnapshot.forEach((rsvpDoc) => {
             batch.delete(rsvpDoc.ref);
         });
 
-        // 3. Commit the batch
         await batch.commit();
         
         toast({
@@ -292,7 +305,6 @@ export default function DashboardPage() {
 
     } catch (error) {
         console.error("Error removing guest and RSVP:", error);
-        // Fallback to emitting a single error for the primary failed action
         const permissionError = new FirestorePermissionError({
           path: guestDocRef.path,
           operation: 'delete',
@@ -304,36 +316,29 @@ export default function DashboardPage() {
   // --- Gift Management ---
   const openAddGiftDialog = () => {
     setEditingGift(null);
-    setGiftName("");
-    setGiftDescription("");
-    setGiftPrice("");
-    setGiftImageUrl("");
+    giftForm.reset({ name: "", description: "", price: undefined, imageUrl: "" });
     setIsGiftDialogOpen(true);
   };
 
   const openEditGiftDialog = (gift: GiftType) => {
     setEditingGift(gift);
-    setGiftName(gift.name);
-    setGiftDescription(gift.description || "");
-    setGiftPrice(gift.totalPrice.toString());
-    setGiftImageUrl(gift.imageUrl || "");
+    giftForm.reset({
+      name: gift.name,
+      description: gift.description || "",
+      price: gift.totalPrice,
+      imageUrl: gift.imageUrl || "",
+    });
     setIsGiftDialogOpen(true);
   };
 
-  const handleGiftSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGiftSubmit = async (values: GiftFormValues) => {
     if (!user || !giftsRef) return;
-    if (!giftName || !giftPrice) {
-        toast({ variant: "destructive", title: "Campos obrigatórios", description: "Por favor, preencha o nome e o preço do presente." });
-        return;
-    }
-    setIsSavingGift(true);
-
+    
     const giftData = {
-        name: giftName,
-        description: giftDescription,
-        totalPrice: parseFloat(giftPrice),
-        imageUrl: giftImageUrl,
+        name: values.name,
+        description: values.description,
+        totalPrice: values.price,
+        imageUrl: values.imageUrl,
         ownerId: user.uid, // Required for create rule
     };
 
@@ -343,26 +348,24 @@ export default function DashboardPage() {
         
         updateDoc(giftDocRef, updateData)
             .then(() => {
-                toast({ title: "Presente Atualizado!", description: `"${giftName}" foi atualizado com sucesso.` });
+                toast({ title: "Presente Atualizado!", description: `"${values.name}" foi atualizado com sucesso.` });
                 setIsGiftDialogOpen(false);
             })
             .catch(() => {
                 const permissionError = new FirestorePermissionError({ path: giftDocRef.path, operation: 'update', requestResourceData: updateData });
                 errorEmitter.emit('permission-error', permissionError);
-            })
-            .finally(() => setIsSavingGift(false));
+            });
     } else { // Add new gift
         const newGiftData = { ...giftData, contributedAmount: 0, contributors: [] };
         addDoc(giftsRef, newGiftData)
             .then(() => {
-                toast({ title: "Presente Adicionado!", description: `"${giftName}" foi adicionado à sua lista.` });
+                toast({ title: "Presente Adicionado!", description: `"${values.name}" foi adicionado à sua lista.` });
                 setIsGiftDialogOpen(false);
             })
             .catch(() => {
                 const permissionError = new FirestorePermissionError({ path: giftsRef.path, operation: 'create', requestResourceData: newGiftData });
                 errorEmitter.emit('permission-error', permissionError);
-            })
-            .finally(() => setIsSavingGift(false));
+            });
     }
   };
 
@@ -554,7 +557,7 @@ export default function DashboardPage() {
                                         <AlertDialogHeader>
                                           <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                                           <AlertDialogDescription>
-                                            Essa ação não pode ser desfeita. Isso removerá permanentemente o convidado <strong>{guest.name}</strong> da sua lista.
+                                            Essa ação não pode ser desfeita. Isso removerá permanentemente o convidado <strong>{guest.name}</strong> da sua lista e sua confirmação de presença (se houver).
                                           </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
@@ -603,7 +606,7 @@ export default function DashboardPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {isLoadingRsvps ? renderSkeleton(confirmedGuests.length || 3) : confirmedGuests.map((guest) => (
+                          {(isLoadingRsvps || isLoadingGuests) ? renderSkeleton(confirmedGuests.length || 3) : confirmedGuests.map((guest) => (
                             <TableRow key={guest.id}>
                               <TableCell className="font-medium">
                                 {guest.guestName}
@@ -760,43 +763,71 @@ export default function DashboardPage() {
                           {editingGift ? 'Altere os detalhes do item da sua lista.' : 'Preencha os detalhes do novo item para a sua lista de presentes.'}
                         </DialogDescription>
                       </DialogHeader>
-                      <form onSubmit={handleGiftSubmit}>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="gift-name" className="text-right">
-                              Nome
-                            </Label>
-                            <Input id="gift-name" value={giftName} onChange={(e) => setGiftName(e.target.value)} className="col-span-3" required />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="gift-description" className="text-right">
-                              Descrição
-                            </Label>
-                            <Textarea id="gift-description" value={giftDescription} onChange={(e) => setGiftDescription(e.target.value)} className="col-span-3" />
-                          </div>
-                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="gift-price" className="text-right">
-                              Preço (R$)
-                            </Label>
-                            <Input id="gift-price" type="number" step="0.01" value={giftPrice} onChange={(e) => setGiftPrice(e.target.value)} className="col-span-3" required />
-                          </div>
-                           <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="gift-image" className="text-right">
-                              URL da Imagem
-                            </Label>
-                            <Input id="gift-image" placeholder="Opcional" value={giftImageUrl} onChange={(e) => setGiftImageUrl(e.target.value)} className="col-span-3" />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button type="button" variant="secondary">Cancelar</Button>
-                          </DialogClose>
-                          <Button type="submit" disabled={isSavingGift}>
-                            {isSavingGift ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            {isSavingGift ? 'Salvando...' : 'Salvar'}
-                          </Button>
-                        </DialogFooter>
-                      </form>
+                      <Form {...giftForm}>
+                        <form onSubmit={giftForm.handleSubmit(handleGiftSubmit)} className="space-y-4">
+                          <FormField
+                            control={giftForm.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Nome</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Ex: Jogo de Panelas" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={giftForm.control}
+                            name="description"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Descrição</FormLabel>
+                                <FormControl>
+                                  <Textarea placeholder="Descreva o presente (opcional)" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={giftForm.control}
+                            name="price"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Preço (R$)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" step="0.01" placeholder="150,00" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={giftForm.control}
+                            name="imageUrl"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>URL da Imagem</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://exemplo.com/imagem.png (opcional)" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button type="button" variant="secondary">Cancelar</Button>
+                            </DialogClose>
+                            <Button type="submit" disabled={giftForm.formState.isSubmitting}>
+                              {giftForm.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              {giftForm.formState.isSubmitting ? 'Salvando...' : 'Salvar'}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </Form>
                     </DialogContent>
                    </Dialog>
                 </div>
@@ -921,7 +952,4 @@ export default function DashboardPage() {
       </Tabs>
     </TooltipProvider>
   );
-
 }
-
-    
