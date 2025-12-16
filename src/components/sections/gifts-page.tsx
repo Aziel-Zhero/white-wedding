@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -116,13 +117,15 @@ export default function GiftsPageSection() {
                 <CardContent className="p-4 flex flex-col flex-grow">
                     <div className="relative w-full aspect-[3/2] rounded-md overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
                       {gift.image ? (
-                          <Image
-                          src={gift.image.imageUrl}
-                          alt={gift.name}
-                          fill
-                          className="object-contain p-2"
-                          data-ai-hint={gift.image.imageHint}
-                          />
+                          <div className="w-full h-full bg-white">
+                            <Image
+                              src={gift.image.imageUrl}
+                              alt={gift.name}
+                              fill
+                              className="object-contain p-0.5"
+                              data-ai-hint={gift.image.imageHint}
+                            />
+                          </div>
                       ) : (
                         <div className="w-full h-full bg-secondary flex items-center justify-center">
                           <Gift className="w-12 h-12 text-muted-foreground" />

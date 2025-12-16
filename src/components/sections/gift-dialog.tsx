@@ -24,7 +24,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -186,7 +185,7 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                                 src={gift.image.imageUrl}
                                 alt={gift.name}
                                 fill
-                                className="object-contain p-2"
+                                className="object-contain p-0.5"
                                 data-ai-hint={gift.image.imageHint}
                             />
                         </div>
