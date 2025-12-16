@@ -181,12 +181,12 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                     </div>
 
                     {gift.image && (
-                        <div className="relative w-full aspect-square max-w-sm rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
+                        <div className="relative w-full aspect-[3/2] rounded-lg overflow-hidden border-4 border-primary/20 mx-auto shadow-md">
                             <Image
                                 src={gift.image.imageUrl}
                                 alt={gift.name}
                                 fill
-                                className="object-cover"
+                                className="object-contain p-2"
                                 data-ai-hint={gift.image.imageHint}
                             />
                         </div>
