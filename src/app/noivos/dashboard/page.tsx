@@ -80,6 +80,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -148,6 +149,7 @@ export default function DashboardPage() {
       imageUrl: "",
     },
   });
+  const { reset: resetGiftForm } = giftForm;
 
   // --- Firebase Data ---
   const guestsRef = useMemoFirebase(() => firestore ? collection(firestore, "couples", coupleId, "guests") : null, [firestore]);
@@ -316,13 +318,13 @@ export default function DashboardPage() {
   // --- Gift Management ---
   const openAddGiftDialog = () => {
     setEditingGift(null);
-    giftForm.reset({ name: "", description: "", price: undefined, imageUrl: "" });
+    resetGiftForm({ name: "", description: "", price: undefined, imageUrl: "" });
     setIsGiftDialogOpen(true);
   };
 
   const openEditGiftDialog = (gift: GiftType) => {
     setEditingGift(gift);
-    giftForm.reset({
+    resetGiftForm({
       name: gift.name,
       description: gift.description || "",
       price: gift.totalPrice,
@@ -361,6 +363,7 @@ export default function DashboardPage() {
             .then(() => {
                 toast({ title: "Presente Adicionado!", description: `"${values.name}" foi adicionado à sua lista.` });
                 setIsGiftDialogOpen(false);
+                resetGiftForm();
             })
             .catch(() => {
                 const permissionError = new FirestorePermissionError({ path: giftsRef.path, operation: 'create', requestResourceData: newGiftData });
