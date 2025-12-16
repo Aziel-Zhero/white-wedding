@@ -408,6 +408,7 @@ export default function DashboardPage() {
   const renderSkeleton = (rows = 5) => (
     Array.from({ length: rows }).map((_, index) => (
       <TableRow key={index}>
+        <TableCell><Skeleton className="h-4 w-4" /></TableCell>
         <TableCell><Skeleton className="h-4 w-32" /></TableCell>
         <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-48" /></TableCell>
         <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
@@ -512,6 +513,7 @@ export default function DashboardPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-[50px]">#</TableHead>
                         <TableHead>Nome</TableHead>
                         <TableHead className="hidden sm:table-cell">Email</TableHead>
                         <TableHead>Status</TableHead>
@@ -519,11 +521,12 @@ export default function DashboardPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {isLoadingGuests ? renderSkeleton() : (allGuests ?? []).map((guest) => {
+                      {isLoadingGuests ? renderSkeleton() : (allGuests ?? []).map((guest, index) => {
                           const isConfirmed = confirmedGuests.some(c => c.guestName === guest.name);
                           const status = isConfirmed ? 'Confirmado' : 'Pendente';
                           return (
                             <TableRow key={guest.id}>
+                              <TableCell className="font-medium">{index + 1}</TableCell>
                               <TableCell className="font-medium">
                                 {guest.name}
                               </TableCell>
@@ -604,13 +607,15 @@ export default function DashboardPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
+                            <TableHead className="w-[50px]">#</TableHead>
                             <TableHead>Nome</TableHead>
                             <TableHead className="text-right">Status</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {(isLoadingRsvps || isLoadingGuests) ? renderSkeleton(confirmedGuests.length || 3) : confirmedGuests.map((guest) => (
+                          {(isLoadingRsvps || isLoadingGuests) ? renderSkeleton(confirmedGuests.length || 3) : confirmedGuests.map((guest, index) => (
                             <TableRow key={guest.id}>
+                              <TableCell className="font-medium">{index + 1}</TableCell>
                               <TableCell className="font-medium">
                                 {guest.guestName}
                               </TableCell>
@@ -632,13 +637,15 @@ export default function DashboardPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
+                            <TableHead className="w-[50px]">#</TableHead>
                             <TableHead>Nome</TableHead>
                             <TableHead className="text-right">Status</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {(isLoadingGuests || isLoadingRsvps) ? renderSkeleton(pendingGuests.length || 5) : pendingGuests.map((guest) => (
+                          {(isLoadingGuests || isLoadingRsvps) ? renderSkeleton(pendingGuests.length || 5) : pendingGuests.map((guest, index) => (
                             <TableRow key={guest.id}>
+                              <TableCell className="font-medium">{index + 1}</TableCell>
                               <TableCell className="font-medium">
                                 {guest.name}
                               </TableCell>
