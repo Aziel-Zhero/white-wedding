@@ -145,7 +145,7 @@ export default function DashboardPage() {
     defaultValues: {
       name: "",
       description: "",
-      price: undefined,
+      price: '' as unknown as number, // Start with empty string for controlled input
       imageUrl: "",
     },
   });
@@ -318,7 +318,7 @@ export default function DashboardPage() {
   // --- Gift Management ---
   const openAddGiftDialog = () => {
     setEditingGift(null);
-    resetGiftForm({ name: "", description: "", price: undefined, imageUrl: "" });
+    resetGiftForm({ name: "", description: "", price: '' as any, imageUrl: "" });
     setIsGiftDialogOpen(true);
   };
 
@@ -801,7 +801,13 @@ export default function DashboardPage() {
                               <FormItem>
                                 <FormLabel>Preço (R$)</FormLabel>
                                 <FormControl>
-                                  <Input type="number" step="0.01" placeholder="150,00" {...field} />
+                                  <Input 
+                                    type="number" 
+                                    step="0.01" 
+                                    placeholder="150,00" 
+                                    {...field}
+                                    onChange={(event) => field.onChange(event.target.value === '' ? undefined : +event.target.value)} 
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -956,3 +962,5 @@ export default function DashboardPage() {
     </TooltipProvider>
   );
 }
+
+    
