@@ -210,8 +210,8 @@ export default function GiftDialog({ gift, onConfirm, children }: { gift: GiftTy
                     <Separator className="my-4" />
 
                     <div className="py-4 space-y-4 text-center">
-                        <div className="relative w-40 h-40 mx-auto border-4 border-primary rounded-lg overflow-hidden">
-                            <Image src={qrCodeImage} alt="QR Code PIX" width={300} height={300} objectFit="cover" />
+                        <div className="relative w-full max-w-40 aspect-square mx-auto border-4 border-primary rounded-lg overflow-hidden">
+                            <Image src={qrCodeImage} alt="QR Code PIX" fill className="object-contain" />
                         </div>
                         <p className="text-sm text-muted-foreground">Escaneie o QR Code acima ou copie a chave.</p>
                         <div className="flex items-center justify-center p-3 bg-secondary rounded-md">
