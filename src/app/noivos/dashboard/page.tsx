@@ -113,7 +113,25 @@ const giftFormSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
   description: z.string().optional(),
   price: z.coerce.number().positive("O preço deve ser um número positivo."),
-  imageUrl: z.string().url("URL da imagem inválida.").optional().or(z.literal('')),
+  imageUrl: z.string().url("URL da imagem inválida.").optional().or(z.literal('')).refine(
+    (url) => {
+      if (!url) return true; // Allow empty URL
+      try {
+        const hostname = new URL(url).hostname;
+        // Block common video platforms
+        if (hostname.includes('youtube.com') || hostname.includes('youtu.be') || hostname.includes('vimeo.com')) {
+          return false;
+        }
+      } catch (e) {
+        // z.string().url() should have already caught this, but we are safe.
+        return true;
+      }
+      return true;
+    },
+    {
+      message: "Não é permitido adicionar vídeos. Por favor, insira uma URL de imagem válida (ex: .jpg, .png).",
+    }
+  ),
 });
 
 type GiftFormValues = z.infer<typeof giftFormSchema>;
@@ -972,7 +990,3 @@ export default function DashboardPage() {
     </TooltipProvider>
   );
 }
-
-    
-
-    
