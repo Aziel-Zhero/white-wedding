@@ -71,6 +71,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'flowgames.gg',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
