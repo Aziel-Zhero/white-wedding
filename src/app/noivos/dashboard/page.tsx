@@ -145,7 +145,7 @@ export default function DashboardPage() {
     defaultValues: {
       name: "",
       description: "",
-      price: '' as unknown as number, // Start with empty string for controlled input
+      price: undefined,
       imageUrl: "",
     },
   });
@@ -259,7 +259,7 @@ export default function DashboardPage() {
     if (editingGuest) { // Update existing guest
         const guestDocRef = doc(firestore, "couples", coupleId, "guests", editingGuest.id);
         const updatedData = { name: guestName, email: guestEmail };
-        updateDoc(guestDocRef)
+        updateDoc(guestDocRef, updatedData)
             .then(() => {
                 toast({ title: "Convidado Atualizado!", description: `"${guestName}" foi atualizado com sucesso.` });
                 setIsGuestDialogOpen(false);
@@ -318,7 +318,7 @@ export default function DashboardPage() {
   // --- Gift Management ---
   const openAddGiftDialog = () => {
     setEditingGift(null);
-    resetGiftForm({ name: "", description: "", price: '' as any, imageUrl: "" });
+    resetGiftForm({ name: "", description: "", price: undefined, imageUrl: "" });
     setIsGiftDialogOpen(true);
   };
 
@@ -813,6 +813,7 @@ export default function DashboardPage() {
                                     step="0.01" 
                                     placeholder="150,00" 
                                     {...field}
+                                    value={field.value ?? ''}
                                     onChange={(event) => field.onChange(event.target.value === '' ? undefined : +event.target.value)} 
                                   />
                                 </FormControl>
@@ -867,13 +868,15 @@ export default function DashboardPage() {
                                <TableCell className="font-medium">{index + 1}</TableCell>
                               <TableCell className="hidden sm:table-cell">
                                 {gift.image ? (
-                                  <Image
-                                    src={gift.image.imageUrl}
-                                    alt={gift.name}
-                                    width={64}
-                                    height={64}
-                                    className="rounded-md object-contain aspect-square"
-                                  />
+                                  <div className="w-full h-full bg-white">
+                                    <Image
+                                      src={gift.image.imageUrl}
+                                      alt={gift.name}
+                                      width={64}
+                                      height={64}
+                                      className="rounded-md object-contain aspect-square p-0.5"
+                                    />
+                                  </div>
                                 ) : <Skeleton className="h-16 w-16 rounded-md" /> }
                               </TableCell>
                               <TableCell className="font-medium">
@@ -969,5 +972,7 @@ export default function DashboardPage() {
     </TooltipProvider>
   );
 }
+
+    
 
     
