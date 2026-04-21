@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function LocationSection() {
   const address = "Estr. Mun. Jorge Emílio Vieira, S/N - Pindamonhangaba, SP";
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=Chacara+Recanto+Verde,Estrada+Municipal+Jorge+Emilio+Vieira,Pindamonhangaba`;
+  const googleMapsUrl = `https://maps.app.goo.gl/hfaKYsQzZhNTFqnx6`;
 
   return (
     <section id="local" className="py-20 lg:py-32">
